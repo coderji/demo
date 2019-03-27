@@ -3,36 +3,53 @@ package com.ji.algorithm;
 import java.util.Arrays;
 
 public class Sort {
-    private static void quickSort(int[] array, int left, int right) {
-        if (left < right) {
-            int partition = getPartition(array, left, right);
-            System.out.println(Arrays.toString(array));
-            quickSort(array, left, partition - 1);
-            quickSort(array, partition + 1, right);
+    // quickSort
+    private static void quickSort(int[] array, int partition, int right) {
+        if (partition < right) {
+            int newPartition = getNewPartition(array, partition, right);
+            quickSort(array, partition, newPartition - 1);
+            quickSort(array, newPartition + 1, right);
         }
     }
 
-    private static int getPartition(int[] array, int left, int right) {
-        int x = array[left];
-        for (int index = left + 1; index <= right; index++) {
-            if (x > array[index]) {
-                swap(array, left, index);
-                System.out.println("swap x:" + x + " " + Arrays.toString(array));
-                left = index;
+    private static int getNewPartition(int[] array, int partition, int right) {
+        int x = array[partition];
+        for (int index = partition + 1; index <= right; index++) {
+            if (array[index] < x) {
+                swap(array, partition, index);
+                partition = partition + 1;
             }
         }
-        return left;
+        return partition;
     }
 
-    private static void swap(int[] array, int left, int right) {
-        int x = array[left];
-        array[left] = array[right];
-        array[right] = x;
+    private static void swap(int[] array, int partition, int right) {
+        int x = array[right];
+        System.arraycopy(array, partition, array, partition + 1, right - partition);
+        array[partition] = x;
     }
 
     public static void main(String[] args) {
-        int[] array = new int[]{2, 1, 4, 3, 5, 9, 6, 8, 0};
-        quickSort(array, 0, array.length - 1);
-        System.out.println(Arrays.toString(array));
+        int[] array = new int[10];
+        for (int count = 0; count < 8; count++) {
+            for (int i = 0; i < 10; i++) {
+                array[i] = 1 + (int) (Math.random() * 50);
+            }
+            System.out.print(Arrays.toString(array));
+
+            quickSort(array, 0, array.length - 1);
+            String quickSortArray = Arrays.toString(array);
+            System.out.print(" -> " + quickSortArray);
+
+            Arrays.sort(array);
+            String sortArray = Arrays.toString(array);
+            if (quickSortArray.equals(sortArray)) {
+                System.out.print(" OK");
+            } else {
+                System.err.print(" ERROR");
+            }
+            System.out.println();
+        }
+
     }
 }
