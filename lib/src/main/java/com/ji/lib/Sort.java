@@ -1,4 +1,4 @@
-package com.ji.algorithm;
+package com.ji.lib;
 
 import java.util.Arrays;
 

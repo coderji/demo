@@ -1,4 +1,4 @@
-package com.ji.algorithm;
+package com.ji.lib;
 
 public class Tree {
     private static class Node {
