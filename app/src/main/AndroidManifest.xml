@@ -28,6 +28,14 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".FragmentActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
         <service android:name=".MainService" />
+
+        <service android:name=".MainService$InnerService" />
     </application>
 </manifest>
