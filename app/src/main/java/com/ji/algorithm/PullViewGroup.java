@@ -1,18 +1,23 @@
 package com.ji.algorithm;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.ji.utils.LogUtils;
 
-public class PullViewGroup extends LinearLayout {
+public class PullViewGroup extends FrameLayout {
     private String TAG = "PullViewGroup";
+    private View mPullView;
+    private int mPullViewHeight = 100;
     private View mScrollView;
-    private float mDownY;
+    private float mStartY = -1, mScrollUp = -1;
 
     public PullViewGroup(Context context) {
         this(context, null);
@@ -26,11 +31,24 @@ public class PullViewGroup extends LinearLayout {
         this(context, attrs, defStyleAttr, 0);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public PullViewGroup(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+    }
 
-        Button button = new Button(getContext());
-        addView(button, 0);
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        if (getChildCount() == 1) {
+            mScrollView = getChildAt(0);
+        }
+    }
+
+    @Override
+    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        // mScrollView request disallow intercept touch event
+        // super.requestDisallowInterceptTouchEvent(disallowIntercept);
     }
 
     @Override
@@ -38,28 +56,26 @@ public class PullViewGroup extends LinearLayout {
         int action = ev.getActionMasked();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                mScrollView = getChildAt(1);
-                mDownY = ev.getY();
-                LogUtils.v(TAG, "onInterceptTouchEvent ACTION_DOWN mScrollView:" + mScrollView);
+                mStartY = ev.getY();
+                return false;
+            case MotionEvent.ACTION_MOVE:
                 // Negative to check scrolling up, positive to check scrolling down.
-                if (mScrollView.canScrollVertically(-1)) {
-                    LogUtils.v(TAG, "onInterceptTouchEvent ACTION_DOWN canScrollVertically scrolling up");
-                } else {
-                    LogUtils.v(TAG, "onInterceptTouchEvent ACTION_DOWN canScrollVertically can't scrolling up");
+                if (!mScrollView.canScrollVertically(-1) && ev.getY() > mStartY) {
+                    LogUtils.v(TAG, "onInterceptTouchEvent can't scrolling up");
+                    if (mScrollUp == -1) {
+                        mScrollUp = ev.getY();
+
+                        mPullView = new View(getContext());
+                        ViewGroup.LayoutParams layoutParams =
+                                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mPullViewHeight);
+                        mPullView.setLayoutParams(layoutParams);
+                        mPullView.setBackgroundColor(Color.GRAY);
+                        mPullView.setTranslationY(-mPullViewHeight);
+                        addView(mPullView);
+                    }
                     return true;
                 }
-            case MotionEvent.ACTION_MOVE:
-                mScrollView = getChildAt(1);
-                float moveY = ev.getY() - mDownY;
-                LogUtils.v(TAG, "onInterceptTouchEvent ACTION_MOVE mScrollView:" + mScrollView + " moveY:" + moveY);
-                // Negative to check scrolling up, positive to check scrolling down.
-                if (mScrollView.canScrollVertically(-1)) {
-                    LogUtils.v(TAG, "onInterceptTouchEvent ACTION_MOVE canScrollVertically scrolling up");
-                } else {
-                    LogUtils.v(TAG, "onInterceptTouchEvent ACTION_MOVE canScrollVertically can't scrolling up");
-                    mScrollView.scrollTo(0, (int) moveY);
-                    //return true;
-                }
+                return false;
             case MotionEvent.ACTION_UP:
                 return false;
         }
@@ -67,18 +83,36 @@ public class PullViewGroup extends LinearLayout {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int action = event.getActionMasked();
+    public boolean onTouchEvent(MotionEvent ev) {
+        LogUtils.v(TAG, "onTouchEvent");
+        int action = ev.getActionMasked();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                LogUtils.v(TAG, "onTouchEvent ACTION_DOWN mScrollView:" + mScrollView);
                 return false;
             case MotionEvent.ACTION_MOVE:
-                LogUtils.v(TAG, "onTouchEvent ACTION_MOVE mScrollView:" + mScrollView);
+                float moveY = ev.getY() - mScrollUp;
+                // Negative to check scrolling up, positive to check scrolling down.
+                if (!mScrollView.canScrollVertically(-1) && moveY > 0) {
+                    mScrollView.setTranslationY(moveY);
+                    mPullView.setTranslationY(-mPullViewHeight + moveY);
+                    return true;
+                }
                 return false;
             case MotionEvent.ACTION_UP:
+                if (mScrollUp != -1) {
+                    mScrollUp = -1;
+
+                    mScrollView.setTranslationY(0);
+                    removeView(mPullView);
+                }
+                performClick();
                 return false;
         }
-        return super.onTouchEvent(event);
+        return super.onTouchEvent(ev);
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 }

@@ -15,7 +15,6 @@ public class LogUtils {
             android.util.Log.v(TAG, "sPhone:" + sPhone);
         } catch (Exception e) {
             sPhone = false;
-            println("V", TAG, "sPhone:" + sPhone);
         }
     }
 
