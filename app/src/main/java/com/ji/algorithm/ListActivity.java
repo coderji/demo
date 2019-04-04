@@ -24,9 +24,12 @@ public class ListActivity extends Activity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                /*
                 int count = mListView.getChildCount();
                 int top = mListView.getChildAt(0).getTop();
                 LogUtils.v(TAG, "count:" + count + " top:" + top);
+                */
+                ((MainApplication) getApplication()).destroyActivity(MainActivity.class);
             }
         });
     }

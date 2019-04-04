@@ -26,14 +26,23 @@ public class MainActivity extends AppCompatActivity {
         findViewById(android.R.id.content).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ListActivity.class));
+                /*
                 if (!mStart) {
                     startForegroundService(new Intent(getApplicationContext(), MainService.class));
                 } else {
                     stopService(new Intent(getApplicationContext(), MainService.class));
                 }
                 mStart = !mStart;
+                */
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LogUtils.v(TAG, "onDestroy");
     }
 
     private void sendNotify(String name) {
