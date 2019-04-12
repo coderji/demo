@@ -26,4 +26,25 @@ public class ReflectUtils {
         }
         return null;
     }
+
+    public static Object getField(String s, Object o, String f) {
+        try {
+            Field field = Class.forName(s).getDeclaredField(f);
+            field.setAccessible(true);
+            return field.get(o);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void setField(String s, Object o, String f, Object v) {
+        try {
+            Field field = Class.forName(s).getDeclaredField(f);
+            field.setAccessible(true);
+            field.set(o, v);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

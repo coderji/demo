@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class ProducerConsumer {
+public class ProducerConsumerTest {
     private static int count = 0;
     private static final int FULL = 10;
     private static final String LOCK = "lock";

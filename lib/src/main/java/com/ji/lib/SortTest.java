@@ -2,7 +2,7 @@ package com.ji.lib;
 
 import java.util.Arrays;
 
-public class Sort {
+public class SortTest {
     // quickSort
     private static void quickSort(int[] array, int partition, int right) {
         if (partition < right) {

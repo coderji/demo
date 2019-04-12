@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.ji.utils.LogUtils;
 
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
                 mStart = !mStart;
             }
         });
+
+        // ((TextView) findViewById(R.id.main_tv)).setText("Fix bug.");
     }
 
     @Override

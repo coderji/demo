@@ -3,7 +3,7 @@ package com.ji.lib;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DeadLock {
+public class DeadLockTest {
     private static Lock aLock = new ReentrantLock();
     private static Lock bLock = new ReentrantLock();
 

@@ -2,7 +2,7 @@ package com.ji.lib;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Atomic {
+public class AtomicTest {
     private static volatile int atomicFail = 0; // volatile 不能解决atomicFail++的非原子性
     private static final int MAX = 1000 * 1000;
     private static AtomicInteger atomicInteger = new AtomicInteger(0);

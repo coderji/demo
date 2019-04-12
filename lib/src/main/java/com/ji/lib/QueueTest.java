@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
 
-public class Queue {
+public class QueueTest {
     private static class StackQueue<E> {
         private Stack<E> stack = new Stack<>();
         private Stack<E> helpStack = new Stack<>();

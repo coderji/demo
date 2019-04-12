@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ThreadPool {
+public class ThreadPoolTest {
     private static AtomicInteger runCount = new AtomicInteger();
 
     private static class NamedRunnable implements Runnable {

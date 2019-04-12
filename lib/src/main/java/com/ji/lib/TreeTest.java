@@ -1,6 +1,6 @@
 package com.ji.lib;
 
-public class Tree {
+public class TreeTest {
     private static class Node {
         public Node left, right;
         public int data;

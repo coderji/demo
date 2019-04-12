@@ -2,8 +2,10 @@ package com.ji.algorithm;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 
+import com.ji.utils.FixBugUtils;
 import com.ji.utils.LogUtils;
 
 import java.lang.ref.WeakReference;
@@ -12,6 +14,13 @@ import java.util.ArrayList;
 public class MainApplication extends Application {
     private String TAG = "MainApplication";
     private ArrayList<WeakReference<Activity>> mWeakActivity = new ArrayList<>();
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+
+        FixBugUtils.load(base);
+    }
 
     @Override
     public void onCreate() {
