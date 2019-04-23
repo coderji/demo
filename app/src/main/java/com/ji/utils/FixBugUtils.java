@@ -1,6 +1,7 @@
 package com.ji.utils;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 
 import java.io.File;
 import java.lang.reflect.Array;
@@ -12,18 +13,18 @@ import dalvik.system.DexClassLoader;
 public class FixBugUtils {
     private static String TAG = "FixBugUtils";
 
-    public static void load(Context context) {
-        Object oldDexPathList = ReflectUtils.getField(BaseDexClassLoader.class, context.getClassLoader(), "pathList");
-        Object[] oldDexElements = (Object[]) ReflectUtils.getField("dalvik.system.DexPathList", oldDexPathList, "dexElements");
+    public static void loadDex(Context context) {
+        Object oldDexPathList = ReflectUtils.getField(BaseDexClassLoader.class, "pathList", context.getClassLoader());
+        Object[] oldDexElements = (Object[]) ReflectUtils.getField("dalvik.system.DexPathList", "dexElements", oldDexPathList);
         LogUtils.v(TAG, "oldDexElements:" + Arrays.toString(oldDexElements));
 
         File externalCacheDir = context.getExternalCacheDir();
         if (externalCacheDir != null) {
             String dexPath = externalCacheDir.getPath() + File.separator + "app-debug.apk";
             Object newDexPathList = ReflectUtils.getField(BaseDexClassLoader.class,
-                    new DexClassLoader(dexPath, null, null, null),
-                    "pathList");
-            Object[] newDexElements = (Object[]) ReflectUtils.getField("dalvik.system.DexPathList", newDexPathList, "dexElements");
+                    "pathList",
+                    new DexClassLoader(dexPath, null, null, null));
+            Object[] newDexElements = (Object[]) ReflectUtils.getField("dalvik.system.DexPathList", "dexElements", newDexPathList);
             LogUtils.v(TAG, "newDexElements:" + Arrays.toString(newDexElements));
 
             // merge dexElements
@@ -39,8 +40,17 @@ public class FixBugUtils {
                     Array.set(mergeDexElements, newDexElementsLength + i, Array.get(oldDexElements, i));
                 }
                 LogUtils.v(TAG, "mergeDexElements:" + Arrays.toString((Object[]) mergeDexElements));
-                ReflectUtils.setField("dalvik.system.DexPathList", oldDexPathList, "dexElements", mergeDexElements);
+                ReflectUtils.setField("dalvik.system.DexPathList", "dexElements", oldDexPathList, mergeDexElements);
             }
+        }
+    }
+
+    public static void loadAssets(Context context) {
+        File externalCacheDir = context.getExternalCacheDir();
+        if (externalCacheDir != null) {
+            ReflectUtils.invoke(context.getAssets(),
+                    ReflectUtils.getMethod(AssetManager.class, "addAssetPath", String.class),
+                    externalCacheDir.getPath() + File.separator + "app-debug.apk");
         }
     }
 }

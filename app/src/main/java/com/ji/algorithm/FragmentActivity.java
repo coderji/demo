@@ -5,7 +5,9 @@ import android.os.Bundle;
 
 import com.ji.utils.LogUtils;
 
-public class FragmentActivity extends androidx.fragment.app.FragmentActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class FragmentActivity extends AppCompatActivity {
     private static final String TAG = "FragmentActivity";
 
     @Override
@@ -17,7 +19,7 @@ public class FragmentActivity extends androidx.fragment.app.FragmentActivity {
         }
     }
 
-    private static class Fragment extends androidx.fragment.app.Fragment {
+    public static class Fragment extends androidx.fragment.app.Fragment {
         public Fragment() {
             LogUtils.v(TAG, "new Fragment " + getActivity());
         }

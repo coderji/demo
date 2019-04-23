@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.ji.utils.FixBugUtils;
 import com.ji.utils.LogUtils;
+import com.ji.utils.ReflectUtils;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // ((TextView) findViewById(R.id.main_tv)).setText("Fix bug.");
+        FixBugUtils.loadAssets(this);
+        ((TextView) findViewById(R.id.main_tv)).setText(getString((int) ReflectUtils.getField("com.ape.easymode.R$string", "always", null)));
     }
 
     @Override
