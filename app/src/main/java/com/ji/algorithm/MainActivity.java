@@ -9,7 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.ji.utils.FixBugUtils;
 import com.ji.utils.LogUtils;
@@ -38,9 +39,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // ((TextView) findViewById(R.id.main_tv)).setText("Fix bug.");
-        FixBugUtils.loadAssets(this);
-        ((TextView) findViewById(R.id.main_tv)).setText(getString((int) ReflectUtils.getField("com.ape.easymode.R$string", "always", null)));
+        Button button = findViewById(R.id.main_btn);
+        // button.setText("Fix bug.");
+        // FixBugUtils.loadAssets(this);
+        // button.setText(getString((int) ReflectUtils.getField("com.ape.easymode.R$string", "always", null)));
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "startActivity SingleInstanceActivity", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(MainActivity.this, SingleInstanceActivity.class));
+            }
+        });
     }
 
     @Override

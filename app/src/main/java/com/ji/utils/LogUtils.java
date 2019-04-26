@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class LogUtils {
-    private static final String TAG = "App";
+    private static final String TAG = "Algorithm";
     private static boolean sPhone = true;
 
     static {

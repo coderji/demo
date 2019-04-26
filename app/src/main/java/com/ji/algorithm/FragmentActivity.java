@@ -1,7 +1,12 @@
 package com.ji.algorithm;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.ji.utils.LogUtils;
 
@@ -34,6 +39,26 @@ public class FragmentActivity extends AppCompatActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             LogUtils.v(TAG, "Fragment onCreate " + getActivity());
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            LogUtils.v(TAG, "Fragment onCreateView " + getActivity());
+            return inflater.inflate(R.layout.fragment_main, container, false);
+        }
+
+        @Override
+        public void onViewCreated(View view, Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+            LogUtils.v(TAG, "Fragment onViewCreated " + getActivity());
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getContext(), "startActivity SingleInstanceActivity", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getContext(), SingleInstanceActivity.class));
+                }
+            });
         }
 
         @Override
