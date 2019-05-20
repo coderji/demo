@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -31,9 +33,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // startActivity(new Intent(getApplicationContext(), ListActivity.class));
                 if (!mStart) {
-                    startForegroundService(new Intent(getApplicationContext(), MainService.class));
+                    // startForegroundService(new Intent(getApplicationContext(), MainService.class));
+                    sendNotify("xx");
                 } else {
-                    stopService(new Intent(getApplicationContext(), MainService.class));
+                    // stopService(new Intent(getApplicationContext(), MainService.class));
+                    cancelNotify();
                 }
                 mStart = !mStart;
             }
@@ -71,6 +75,12 @@ public class MainActivity extends AppCompatActivity {
                         new NotificationChannel(getPackageName(), "Channel1", NotificationManager.IMPORTANCE_DEFAULT);
                 notificationManager.createNotificationChannel(notificationChannel);
                 builder.setChannelId(notificationChannel.getId());
+                PendingIntent intent = PendingIntent.getActivity(this, 0, new Intent(Intent.ACTION_DIAL), 0);
+                Notification.Action.Builder actionBuilder = new Notification.Action.Builder(
+                        Icon.createWithResource(this, R.mipmap.ic_launcher),
+                        "title",
+                        intent);
+                builder.addAction(actionBuilder.build());
             }
             notificationManager.notify(NOTIFICATION_ID, builder.build());
         }
