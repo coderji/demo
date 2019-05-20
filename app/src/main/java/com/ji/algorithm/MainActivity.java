@@ -40,9 +40,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button button = findViewById(R.id.main_btn);
-        // button.setText("Fix bug.");
-        // FixBugUtils.loadAssets(this);
-        // button.setText(getString((int) ReflectUtils.getField("com.ape.easymode.R$string", "always", null)));
+//        button.setText("Fix bug.");
+//        FixBugUtils.loadAssets(this);
+//        button.setText(getString((int) ReflectUtils.getField("com.ape.easymode.R$string", "always", null)));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

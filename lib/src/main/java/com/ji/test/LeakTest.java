@@ -1,4 +1,4 @@
-package com.ji.lib;
+package com.ji.test;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;

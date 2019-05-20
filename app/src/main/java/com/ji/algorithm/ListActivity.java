@@ -28,7 +28,7 @@ public class ListActivity extends AppCompatActivity {
                 int count = mListView.getChildCount();
                 int top = mListView.getChildAt(0).getTop();
                 LogUtils.v(TAG, "count:" + count + " top:" + top);
-                // ((MainApplication) getApplication()).destroyActivity(MainActivity.class);
+//                ((MainApplication) getApplication()).destroyActivity(MainActivity.class);
             }
         });
     }

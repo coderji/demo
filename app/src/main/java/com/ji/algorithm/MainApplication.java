@@ -19,7 +19,7 @@ public class MainApplication extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
-        // FixBugUtils.loadDex(base);
+//        FixBugUtils.loadDex(base);
     }
 
     @Override

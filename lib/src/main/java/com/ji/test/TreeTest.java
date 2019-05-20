@@ -1,4 +1,4 @@
-package com.ji.lib;
+package com.ji.test;
 
 public class TreeTest {
     private static class Node {

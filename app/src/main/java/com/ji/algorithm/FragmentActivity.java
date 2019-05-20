@@ -19,9 +19,23 @@ public class FragmentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        LogUtils.v(TAG, "onCreate");
+//        setContentView(R.layout.fragment_main);
         if (getSupportFragmentManager().findFragmentByTag("Fragment") == null) {
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, new Fragment(), "Fragment").commit();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LogUtils.v(TAG, "onStart");
+    }
+
+    @Override
+    public void onAttachFragment(androidx.fragment.app.Fragment fragment) {
+        super.onAttachFragment(fragment);
+        LogUtils.v(TAG, "onAttachFragment");
     }
 
     public static class Fragment extends androidx.fragment.app.Fragment {
@@ -44,7 +58,7 @@ public class FragmentActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             LogUtils.v(TAG, "Fragment onCreateView " + getActivity());
-            return inflater.inflate(R.layout.fragment_main, container, false);
+            return inflater.inflate(R.layout.activity_main, container, false);
         }
 
         @Override
@@ -65,6 +79,30 @@ public class FragmentActivity extends AppCompatActivity {
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
             LogUtils.v(TAG, "Fragment onActivityCreated " + getActivity());
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            LogUtils.v(TAG, "Fragment onStart " + getActivity());
+        }
+
+        @Override
+        public void onDestroyView() {
+            super.onDestroyView();
+            LogUtils.v(TAG, "Fragment onDestroyView " + getActivity());
+        }
+
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+            LogUtils.v(TAG, "Fragment onDestroy " + getActivity());
+        }
+
+        @Override
+        public void onDetach() {
+            super.onDetach();
+            LogUtils.v(TAG, "Fragment onDetach " + getActivity());
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.ji.lib;
+package com.ji.test;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
