@@ -1,5 +1,7 @@
 package com.ji.algorithm;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -7,6 +9,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.view.WindowManager;
 
 import com.ji.utils.LogUtils;
 
@@ -53,6 +56,17 @@ public class MainService extends Service {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             stopForeground(true);
         }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Dialog dialog = new AlertDialog.Builder(this, 0).setTitle("title").setMessage("message").create();
+        if (dialog.getWindow() != null && false) {
+            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG); // TYPE_SYSTEM_DIALOG, TYPE_SYSTEM_ALERT
+            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            dialog.show();
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
 
     public static class InnerService extends Service {
