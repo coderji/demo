@@ -52,8 +52,14 @@
         android:visibility="gone" />
 
     <Button
-        android:id="@+id/btn_keyguard_disabled_features"
-        android:text="锁屏禁用功能(长按查询)"
+        android:id="@+id/btn_keyguard_disabled_fingerprint"
+        android:text="锁屏禁用指纹功能(长按查询)"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btn_keyguard_disabled_face"
+        android:text="锁屏禁用人脸功能(长按查询)"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

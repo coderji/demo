@@ -139,7 +139,24 @@ public class DeviceActivity extends AppCompatActivity {
 
         // GoogleCDD
         final TextView displayView = findViewById(R.id.tv_display);
-        findViewById(R.id.btn_keyguard_disabled_features).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_keyguard_disabled_fingerprint).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= 21) {
+                    mDevicePolicyManager.setKeyguardDisabledFeatures(mComponentName, DevicePolicyManager.KEYGUARD_DISABLE_FINGERPRINT);
+                }
+            }
+        });
+        findViewById(R.id.btn_keyguard_disabled_fingerprint).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int disabledFeatures = mDevicePolicyManager.getKeyguardDisabledFeatures(mComponentName);
+                displayView.setText("锁屏禁用功能:0b" + Integer.toBinaryString(disabledFeatures));
+                return false;
+            }
+        });
+
+        findViewById(R.id.btn_keyguard_disabled_face).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (Build.VERSION.SDK_INT >= 28) {
@@ -147,7 +164,7 @@ public class DeviceActivity extends AppCompatActivity {
                 }
             }
         });
-        findViewById(R.id.btn_keyguard_disabled_features).setOnLongClickListener(new View.OnLongClickListener() {
+        findViewById(R.id.btn_keyguard_disabled_face).setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 int disabledFeatures = mDevicePolicyManager.getKeyguardDisabledFeatures(mComponentName);
