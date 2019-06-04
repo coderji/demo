@@ -173,13 +173,60 @@ public class DeviceActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.btn_password_quality).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_keyguard_disabled_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= 28) {
+                    mDevicePolicyManager.setKeyguardDisabledFeatures(mComponentName, DevicePolicyManager.KEYGUARD_DISABLE_FEATURES_NONE);
+                }
+            }
+        });
+        findViewById(R.id.btn_keyguard_disabled_cancel).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int disabledFeatures = mDevicePolicyManager.getKeyguardDisabledFeatures(mComponentName);
+                displayView.setText("锁屏禁用功能:0b" + Integer.toBinaryString(disabledFeatures));
+                return false;
+            }
+        });
+
+        findViewById(R.id.btn_password_quality_weak).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mDevicePolicyManager.setPasswordQuality(mComponentName, DevicePolicyManager.PASSWORD_QUALITY_BIOMETRIC_WEAK);
             }
         });
-        findViewById(R.id.btn_password_quality).setOnLongClickListener(new View.OnLongClickListener() {
+        findViewById(R.id.btn_password_quality_weak).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int passwordQuality = mDevicePolicyManager.getPasswordQuality(null);
+                displayView.setText("密码质量:0x" + Integer.toHexString(passwordQuality));
+                return false;
+            }
+        });
+
+        findViewById(R.id.btn_password_quality_complex).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDevicePolicyManager.setPasswordQuality(mComponentName, DevicePolicyManager.PASSWORD_QUALITY_COMPLEX);
+            }
+        });
+        findViewById(R.id.btn_password_quality_complex).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int passwordQuality = mDevicePolicyManager.getPasswordQuality(null);
+                displayView.setText("密码质量:0x" + Integer.toHexString(passwordQuality));
+                return false;
+            }
+        });
+
+        findViewById(R.id.btn_password_quality_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDevicePolicyManager.setPasswordQuality(mComponentName, DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED);
+            }
+        });
+        findViewById(R.id.btn_password_quality_cancel).setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 int passwordQuality = mDevicePolicyManager.getPasswordQuality(null);
