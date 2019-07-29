@@ -8,6 +8,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +19,8 @@ import android.widget.Toast;
 import com.ji.utils.FixBugUtils;
 import com.ji.utils.LogUtils;
 import com.ji.utils.ReflectUtils;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -50,8 +54,9 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "startActivity SingleInstanceActivity", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(MainActivity.this, SingleInstanceActivity.class));
+//                Toast.makeText(MainActivity.this, "startActivity SingleInstanceActivity", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(MainActivity.this, SingleInstanceActivity.class));
+                queryApps();
             }
         });
     }
@@ -91,6 +96,15 @@ public class MainActivity extends AppCompatActivity {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager != null) {
             notificationManager.cancel(NOTIFICATION_ID);
+        }
+    }
+
+    private void queryApps() {
+        LogUtils.v(TAG, "queryApps");
+        PackageManager pm = getPackageManager();
+        List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+        for (ApplicationInfo info : apps) {
+            LogUtils.v(TAG, "queryApps " + info);
         }
     }
 }
