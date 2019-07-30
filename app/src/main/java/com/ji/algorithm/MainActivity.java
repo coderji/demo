@@ -12,6 +12,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Icon;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -54,9 +55,14 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Toast.makeText(MainActivity.this, "startActivity SingleInstanceActivity", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(MainActivity.this, SingleInstanceActivity.class));
-                queryApps();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "startActivity SingleInstanceActivity", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(MainActivity.this, SingleInstanceActivity.class));
+                    }
+                }, 5 * 1000);
+//                queryApps();
             }
         });
     }
