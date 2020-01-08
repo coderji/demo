@@ -10,17 +10,18 @@ import java.lang.reflect.Method;
 public class ReflectUtils {
     private static final String TAG = "ReflectUtils";
 
-    @SuppressLint("PrivateApi")
+    @SuppressLint("DiscouragedPrivateApi")
     public static String getCallers(final int depth) {
         try {
-            return (String) Debug.class.getDeclaredMethod("getCallers", int.class).invoke(null, depth);
+            return (String) Debug.class.getDeclaredMethod("getCallers", int.class)
+                    .invoke(null, depth);
         } catch (Exception e) {
             LogUtils.e(TAG, "getCallers", e);
         }
         return null;
     }
 
-    public static Method getMethod(Class cls, String methodName, Class... parameterTypes) {
+    public static Method getMethod(Class cls, String methodName, Class<?>... parameterTypes) {
         try {
             Method method = cls.getDeclaredMethod(methodName, parameterTypes);
             method.setAccessible(true);
@@ -31,7 +32,7 @@ public class ReflectUtils {
         return null;
     }
 
-    public static Method getMethod(String cls, String methodName, Class... parameterTypes) {
+    public static Method getMethod(String cls, String methodName, Class<?>... parameterTypes) {
         try {
             return getMethod(Class.forName(cls), methodName, parameterTypes);
         } catch (ClassNotFoundException e) {
