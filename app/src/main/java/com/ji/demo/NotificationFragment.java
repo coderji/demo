@@ -1,4 +1,4 @@
-package com.ji.algorithm;
+package com.ji.demo;
 
 import android.app.Notification;
 import android.app.NotificationChannel;

@@ -2,10 +2,10 @@ package com.ji.utils;
 
 import android.util.Log;
 
-import com.ji.algorithm.BuildConfig;
+import com.ji.demo.BuildConfig;
 
 public class LogUtils {
-    private static final String TAG = "Algorithm";
+    private static final String TAG = "Demo";
 
     public static void v(String tag, String msg) {
         if (BuildConfig.DEBUG || android.util.Log.isLoggable(TAG, android.util.Log.VERBOSE)) {
