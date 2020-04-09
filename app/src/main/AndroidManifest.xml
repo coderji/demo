@@ -20,6 +20,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.ji.demo.ForegroundServiceFragment$MyService" />
+        <service android:name="com.ji.demo.FgServiceFragment$FgService" />
     </application>
 </manifest>

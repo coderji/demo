@@ -58,7 +58,7 @@ public class NotificationFragment extends Fragment {
 
             NotificationChannel channel =
                     new NotificationChannel(getContext().getPackageName(),
-                            "NTChannel", NotificationManager.IMPORTANCE_DEFAULT);
+                            "NotificationChannel", NotificationManager.IMPORTANCE_DEFAULT);
             mNotificationManager.createNotificationChannel(channel);
             builder.setChannelId(channel.getId());
 
@@ -66,7 +66,7 @@ public class NotificationFragment extends Fragment {
                     0, new Intent(Intent.ACTION_DIAL), 0);
             Notification.Action.Builder actionBuilder = new Notification.Action.Builder(
                     Icon.createWithResource(getContext(), android.R.mipmap.sym_def_app_icon),
-                    "Action",
+                    "Dial",
                     intent);
             builder.addAction(actionBuilder.build());
 

@@ -18,8 +18,8 @@ import androidx.fragment.app.Fragment;
 
 import com.ji.utils.LogUtils;
 
-public class ForegroundServiceFragment extends Fragment {
-    private static final String TAG = "ForegroundServiceFragment";
+public class FgServiceFragment extends Fragment {
+    private static final String TAG = "FgServiceFragment";
 
     @Nullable
     @Override
@@ -36,7 +36,7 @@ public class ForegroundServiceFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (getContext() != null) {
-                    getContext().startService(new Intent(getContext(), MyService.class));
+                    getContext().startService(new Intent(getContext(), FgService.class));
                 }
             }
         });
@@ -44,14 +44,14 @@ public class ForegroundServiceFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (getContext() != null) {
-                    getContext().stopService(new Intent(getContext(), MyService.class));
+                    getContext().stopService(new Intent(getContext(), FgService.class));
                 }
             }
         });
     }
 
-    public static class MyService extends Service {
-        private static final String TAG = "MyService";
+    public static class FgService extends Service {
+        private static final String TAG = "FgService";
         public static final int ID = 1;
 
         @Override
@@ -85,7 +85,7 @@ public class ForegroundServiceFragment extends Fragment {
 
                 NotificationChannel channel =
                         new NotificationChannel(getPackageName(),
-                                "MyServiceChannel", NotificationManager.IMPORTANCE_DEFAULT);
+                                "FgServiceChannel", NotificationManager.IMPORTANCE_DEFAULT);
                 notificationManager.createNotificationChannel(channel);
                 builder.setChannelId(channel.getId());
 
