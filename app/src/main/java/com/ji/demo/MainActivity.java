@@ -14,7 +14,7 @@ public class MainActivity extends FragmentActivity {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.main_content, new AnimateFragment())
+                .add(R.id.main_content, new BiometricFragment())
                 .commit();
     }
 }

@@ -24,21 +24,19 @@ public class AnimateFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (getContext() != null) {
-            Drawable drawable = getContext().getDrawable(R.drawable.ic_face_scanning);
-            ((ImageView) view.findViewById(R.id.animate)).setImageDrawable(drawable);
+        Drawable drawable = getResources().getDrawable(R.drawable.ic_face_scanning);
+        ((ImageView) view.findViewById(R.id.animate)).setImageDrawable(drawable);
 
-            final AnimatedVectorDrawable animation = (AnimatedVectorDrawable) drawable;
-            if (animation != null) {
-                animation.clearAnimationCallbacks();
-                animation.registerAnimationCallback(new Animatable2.AnimationCallback() {
-                    @Override
-                    public void onAnimationEnd(Drawable drawable) {
-                        animation.start();
-                    }
-                });
-                animation.start();
-            }
+        final AnimatedVectorDrawable animation = (AnimatedVectorDrawable) drawable;
+        if (animation != null) {
+            animation.clearAnimationCallbacks();
+            animation.registerAnimationCallback(new Animatable2.AnimationCallback() {
+                @Override
+                public void onAnimationEnd(Drawable drawable) {
+                    animation.start();
+                }
+            });
+            animation.start();
         }
     }
 }

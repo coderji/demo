@@ -5,18 +5,18 @@
     android:gravity="bottom|center_horizontal">
 
     <Button
-        android:id="@+id/fg_start"
+        android:id="@+id/biometric_old"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="start"/>
+        android:text="old" />
 
     <Space
         android:layout_width="80dp"
         android:layout_height="0dp" />
 
     <Button
-        android:id="@+id/fg_stop"
+        android:id="@+id/biometric_new"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="stop"/>
+        android:text="new" />
 </LinearLayout>

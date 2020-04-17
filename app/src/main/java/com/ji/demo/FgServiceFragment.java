@@ -35,17 +35,13 @@ public class FgServiceFragment extends Fragment {
         view.findViewById(R.id.fg_start).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getContext() != null) {
-                    getContext().startService(new Intent(getContext(), FgService.class));
-                }
+                v.getContext().startService(new Intent(getContext(), FgService.class));
             }
         });
         view.findViewById(R.id.fg_stop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getContext() != null) {
-                    getContext().stopService(new Intent(getContext(), FgService.class));
-                }
+                v.getContext().stopService(new Intent(getContext(), FgService.class));
             }
         });
     }

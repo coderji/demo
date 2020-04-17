@@ -32,10 +32,7 @@ public class NotificationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (getContext() != null) {
-            mNotificationManager = (NotificationManager) getContext()
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
-        }
+        mNotificationManager = (NotificationManager) view.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
         view.findViewById(R.id.nt_send).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,32 +48,27 @@ public class NotificationFragment extends Fragment {
     }
 
     private void sendNotify() {
-        if (mNotificationManager != null && getContext() != null) {
-            Notification.Builder builder = new Notification.Builder(getContext(), TAG);
-            builder.setContentText(TAG);
-            builder.setSmallIcon(android.R.mipmap.sym_def_app_icon);
+        Notification.Builder builder = new Notification.Builder(getContext(), TAG);
+        builder.setContentText(TAG);
+        builder.setSmallIcon(android.R.mipmap.sym_def_app_icon);
 
-            NotificationChannel channel =
-                    new NotificationChannel(getContext().getPackageName(),
-                            "NotificationChannel", NotificationManager.IMPORTANCE_DEFAULT);
-            mNotificationManager.createNotificationChannel(channel);
-            builder.setChannelId(channel.getId());
+        NotificationChannel channel =
+                new NotificationChannel("NotificationChannelID", "NotificationChannel", NotificationManager.IMPORTANCE_DEFAULT);
+        mNotificationManager.createNotificationChannel(channel);
+        builder.setChannelId(channel.getId());
 
-            PendingIntent intent = PendingIntent.getActivity(getContext(),
-                    0, new Intent(Intent.ACTION_DIAL), 0);
-            Notification.Action.Builder actionBuilder = new Notification.Action.Builder(
-                    Icon.createWithResource(getContext(), android.R.mipmap.sym_def_app_icon),
-                    "Dial",
-                    intent);
-            builder.addAction(actionBuilder.build());
+        PendingIntent intent = PendingIntent.getActivity(getContext(),
+                0, new Intent(Intent.ACTION_DIAL), 0);
+        Notification.Action.Builder actionBuilder = new Notification.Action.Builder(
+                Icon.createWithResource(getContext(), android.R.mipmap.sym_def_app_icon),
+                "Dial",
+                intent);
+        builder.addAction(actionBuilder.build());
 
-            mNotificationManager.notify(ID, builder.build());
-        }
+        mNotificationManager.notify(ID, builder.build());
     }
 
     private void cancelNotify() {
-        if (mNotificationManager != null) {
-            mNotificationManager.cancel(ID);
-        }
+        mNotificationManager.cancel(ID);
     }
 }
