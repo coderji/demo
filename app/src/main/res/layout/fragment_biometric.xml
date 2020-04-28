@@ -5,33 +5,59 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        app:lottie_fileName="2.json"
-        app:lottie_loop="true"
-        app:lottie_autoPlay="true" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:gravity="center_horizontal">
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        app:lottie_fileName="3.json"
-        app:lottie_loop="true"
-        app:lottie_autoPlay="true" />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/fingerprint_white" />
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:lottie_fileName="4.json"
-        android:layout_gravity="center_horizontal"
-        app:lottie_loop="true"
-        app:lottie_autoPlay="true" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="fingerprint_white.json"
+            app:lottie_loop="true" />
 
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:lottie_autoPlay="true"
+                app:lottie_fileName="fingerprint_pressed.json"
+                app:lottie_loop="true" />
+
+            <ImageView
+                android:id="@+id/fingerprint_pressed"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:src="@drawable/fingerprint_pressed" />
+        </FrameLayout>
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/fingerprint_blue" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="fingerprint_blue.json"
+            app:lottie_loop="true" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,7 +71,7 @@
             android:text="old" />
 
         <Space
-            android:layout_width="80dp"
+            android:layout_width="40dp"
             android:layout_height="0dp" />
 
         <Button
