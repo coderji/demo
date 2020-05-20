@@ -21,8 +21,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             app:lottie_autoPlay="true"
-            app:lottie_fileName="fingerprint_white.json"
-            app:lottie_loop="true" />
+            app:lottie_rawRes="@raw/fingerprint_white"
+            app:lottie_repeatCount="2" />
 
         <FrameLayout
             android:layout_width="0dp"
@@ -33,8 +33,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:lottie_autoPlay="true"
-                app:lottie_fileName="fingerprint_pressed.json"
-                app:lottie_loop="true" />
+                app:lottie_rawRes="@raw/fingerprint_pressed"
+                app:lottie_repeatCount="5" />
 
             <ImageView
                 android:id="@+id/fingerprint_pressed"
@@ -55,8 +55,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             app:lottie_autoPlay="true"
-            app:lottie_fileName="fingerprint_blue.json"
-            app:lottie_loop="true" />
+            app:lottie_rawRes="@raw/fingerprint_blue"
+            app:lottie_repeatCount="2" />
     </LinearLayout>
 
     <LinearLayout
@@ -79,5 +79,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="new" />
+
+        <Space
+            android:layout_width="40dp"
+            android:layout_height="0dp" />
+
+        <Button
+            android:id="@+id/overlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="overlay" />
     </LinearLayout>
 </LinearLayout>
