@@ -1,16 +1,21 @@
 package com.ji.demo;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemProperties;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,6 +34,8 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
     private View mLightView, mDarkView;
     private WindowManager.LayoutParams mLightLayoutParams, mDarkLayoutParams;
     private boolean mLight = false;
+    private int mBrightnessDefault, mBrightnessMin, mBrightnessMax, mLastBrightness, mLastMode;
+    private String HBM_PATH = "/sys/class/backlight/panel0-backlight/hbm";
 
     @Nullable
     @Override
@@ -51,6 +58,14 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
                 LogUtils.d(TAG, "onClick view:" + view);
             }
         });
+
+        mBrightnessDefault = view.getResources().getInteger(view.getResources().
+                getIdentifier("config_screenBrightnessSettingDefault", "integer", "android"));
+        mBrightnessMin = view.getResources().getInteger(view.getResources().
+                getIdentifier("config_screenBrightnessSettingMinimum", "integer", "android"));
+        mBrightnessMax = view.getResources().getInteger(view.getResources().
+                getIdentifier("config_screenBrightnessSettingMaximum", "integer", "android"));
+        LogUtils.d(TAG, "mBrightnessDefault:" + mBrightnessDefault + " mBrightnessMin:" + mBrightnessMin + " mBrightnessMax:" + mBrightnessMax);
     }
 
     private void setBiometricOld(View view) {
@@ -163,7 +178,6 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
                 PixelFormat.TRANSLUCENT);
         mDarkLayoutParams.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         mDarkLayoutParams.gravity = Gravity.BOTTOM;
-        mDarkLayoutParams.alpha = 0.5f;
         mDarkLayoutParams.setTitle("DarkLayout");
 
         mLightLayoutParams = new WindowManager.LayoutParams(
@@ -174,28 +188,45 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
                 PixelFormat.TRANSLUCENT);
         mLightLayoutParams.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         mLightLayoutParams.gravity = Gravity.BOTTOM;
-        mLightLayoutParams.y = 400;
+        mLightLayoutParams.y = 300;
         mLightLayoutParams.setTitle("LightLayout");
 
         mDarkView = new View(view.getContext());
         mDarkView.setId(R.id.dark);
         mDarkView.setBackgroundColor(Color.BLACK);
 
-        mLightView = new View(view.getContext());
+        mLightView = new FrameLayout(view.getContext());
         mLightView.setId(R.id.light);
         mLightView.setBackgroundColor(Color.WHITE);
-
         mLightView.setOnClickListener(mRemoveViewListener);
 
         view.setOnClickListener(mAddViewListener);
     }
 
-    private View.OnClickListener mAddViewListener = new View.OnClickListener() {
+    private final View.OnClickListener mAddViewListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             LogUtils.d(TAG, "onClick view:" + view);
             if (!mLight) {
                 try {
+                    if (getContext() != null) {
+                        ContentResolver contentResolver = getContext().getContentResolver();
+                        mLastBrightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessDefault);
+                        mLastMode = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                        LogUtils.d(TAG, "brightness " + (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL ? "manual" : "automatic") + " " + mLastBrightness + " -> " + mBrightnessMax);
+                        if (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                        }
+                        Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessMax);
+                    }
+                    mDarkView.setAlpha(calculateOverlayAlpha());
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            SystemProperties.set("config.write.one", HBM_PATH);
+                        }
+                    }, 20);
+
                     mWindowManager.addView(mDarkView, mDarkLayoutParams);
                     mWindowManager.addView(mLightView, mLightLayoutParams);
                     mLight = true;
@@ -206,12 +237,27 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
         }
     };
 
-    private View.OnClickListener mRemoveViewListener = new View.OnClickListener() {
+    private final View.OnClickListener mRemoveViewListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             LogUtils.d(TAG, "onClick view:" + view);
             if (mLight) {
                 try {
+                    SystemProperties.set("config.write.zero", HBM_PATH);
+                    if (getContext() != null) {
+                        ContentResolver contentResolver = getContext().getContentResolver();
+                        int brightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessDefault);
+                        if (brightness == mBrightnessMax) {
+                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mLastBrightness);
+                        } else {
+                            LogUtils.e(TAG, "brightness change");
+                        }
+                        if (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+                        }
+                    }
+                    mDarkView.setAlpha(0f);
+
                     mWindowManager.removeView(mLightView);
                     mWindowManager.removeView(mDarkView);
                     mLight = false;
@@ -230,5 +276,14 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
         } else {
             return false;
         }
+    }
+
+    private float calculateOverlayAlpha() {
+        float alpha = 0.3f;
+        if (mLastBrightness >= mBrightnessMin && mLastBrightness <= mBrightnessMax) {
+            alpha = 0.3f + 0.35f * (mBrightnessMax - mLastBrightness) / (mBrightnessMax - mBrightnessMin);
+        }
+        LogUtils.d(TAG, "calculateOverlayAlpha mLastBrightness:" + mLastBrightness + " alpha:" + alpha);
+        return alpha;
     }
 }
