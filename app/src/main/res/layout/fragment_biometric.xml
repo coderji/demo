@@ -71,7 +71,7 @@
             android:text="old" />
 
         <Space
-            android:layout_width="40dp"
+            android:layout_width="10dp"
             android:layout_height="0dp" />
 
         <Button
@@ -81,13 +81,23 @@
             android:text="new" />
 
         <Space
-            android:layout_width="40dp"
+            android:layout_width="10dp"
             android:layout_height="0dp" />
 
         <Button
-            android:id="@+id/overlay"
+            android:id="@+id/biometric_overlay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="overlay" />
+
+        <Space
+                android:layout_width="10dp"
+                android:layout_height="0dp" />
+
+        <Button
+                android:id="@+id/biometric_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="test" />
     </LinearLayout>
 </LinearLayout>

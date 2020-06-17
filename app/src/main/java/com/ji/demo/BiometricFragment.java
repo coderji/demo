@@ -49,7 +49,8 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
 
         setBiometricOld(view.findViewById(R.id.biometric_old));
         setBiometricNew(view.findViewById(R.id.biometric_new));
-        setOverlayView(view.findViewById(R.id.overlay));
+        setOverlayView(view.findViewById(R.id.biometric_overlay));
+        setTestView(view.findViewById(R.id.biometric_test));
 
         view.setId(R.id.biometric);
         view.setOnClickListener(new View.OnClickListener() {
@@ -285,5 +286,39 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
         }
         LogUtils.d(TAG, "calculateOverlayAlpha mLastBrightness:" + mLastBrightness + " alpha:" + alpha);
         return alpha;
+    }
+
+    private void setTestView(View view) {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final ContentResolver contentResolver = v.getContext().getContentResolver();
+                mLastBrightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessDefault);
+                mLastMode = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                LogUtils.d(TAG, "brightness "
+                        + (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL ? "manual" : "automatic")
+                        + " " + mLastBrightness + " -> " + mBrightnessMax);
+                if (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                    Settings.System.putInt(contentResolver,
+                            Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                }
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessMax);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        int brightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessDefault);
+                        if (brightness == mBrightnessMax) {
+                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mLastBrightness);
+                        } else {
+                            LogUtils.e(TAG, "brightness change");
+                        }
+                        if (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+                        }
+                    }
+                }, 8000);
+            }
+        });
     }
 }
