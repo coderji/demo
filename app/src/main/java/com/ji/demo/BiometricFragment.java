@@ -1,21 +1,20 @@
 package com.ji.demo;
 
 import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.SystemProperties;
-import android.provider.Settings;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,13 +27,11 @@ import androidx.fragment.app.Fragment;
 
 import com.ji.utils.LogUtils;
 
-public class BiometricFragment extends Fragment implements MainActivity.BackPressed {
+public class BiometricFragment extends Fragment {
     private static final String TAG = "BiometricFragment";
     private WindowManager mWindowManager;
-    private View mLightView, mDarkView;
-    private WindowManager.LayoutParams mLightLayoutParams, mDarkLayoutParams;
-    private boolean mLight = false;
-    private int mBrightnessDefault, mBrightnessMin, mBrightnessMax, mLastBrightness, mLastMode;
+    private SurfaceView mDarkView, mLightView;
+    private WindowManager.LayoutParams mDarkLayoutParams, mLightLayoutParams;
     private String HBM_PATH = "/sys/class/backlight/panel0-backlight/hbm";
 
     @Nullable
@@ -50,7 +47,6 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
         setBiometricOld(view.findViewById(R.id.biometric_old));
         setBiometricNew(view.findViewById(R.id.biometric_new));
         setOverlayView(view.findViewById(R.id.biometric_overlay));
-        setTestView(view.findViewById(R.id.biometric_test));
 
         view.setId(R.id.biometric);
         view.setOnClickListener(new View.OnClickListener() {
@@ -59,14 +55,6 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
                 LogUtils.d(TAG, "onClick view:" + view);
             }
         });
-
-        mBrightnessDefault = view.getResources().getInteger(view.getResources().
-                getIdentifier("config_screenBrightnessSettingDefault", "integer", "android"));
-        mBrightnessMin = view.getResources().getInteger(view.getResources().
-                getIdentifier("config_screenBrightnessSettingMinimum", "integer", "android"));
-        mBrightnessMax = view.getResources().getInteger(view.getResources().
-                getIdentifier("config_screenBrightnessSettingMaximum", "integer", "android"));
-        LogUtils.d(TAG, "mBrightnessDefault:" + mBrightnessDefault + " mBrightnessMin:" + mBrightnessMin + " mBrightnessMax:" + mBrightnessMax);
     }
 
     private void setBiometricOld(View view) {
@@ -192,133 +180,63 @@ public class BiometricFragment extends Fragment implements MainActivity.BackPres
         mLightLayoutParams.y = 300;
         mLightLayoutParams.setTitle("LightLayout");
 
-        mDarkView = new View(view.getContext());
+        mDarkView = new SurfaceView(view.getContext());
         mDarkView.setId(R.id.dark);
-        mDarkView.setBackgroundColor(Color.BLACK);
+//        mDarkView.setBackgroundColor(Color.BLACK);
+        mDarkView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+        mDarkView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                LogUtils.d(TAG, "surfaceCreated");
+                Canvas canvas = holder.lockCanvas();
+                canvas.drawColor(Color.argb(0.6f, 0, 0, 0));
+                holder.unlockCanvasAndPost(canvas);
+            }
 
-        mLightView = new FrameLayout(view.getContext());
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                LogUtils.d(TAG, "surfaceChanged");
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                LogUtils.d(TAG, "surfaceDestroyed");
+            }
+        });
+        mDarkView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                mDarkView.post(() -> SystemProperties.set("config.write.one", HBM_PATH));
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                mDarkView.post(() -> SystemProperties.set("config.write.zero", HBM_PATH));
+            }
+        });
+
+        mLightView = new SurfaceView(view.getContext());
         mLightView.setId(R.id.light);
         mLightView.setBackgroundColor(Color.WHITE);
-        mLightView.setOnClickListener(mRemoveViewListener);
 
-        view.setOnClickListener(mAddViewListener);
-    }
-
-    private final View.OnClickListener mAddViewListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            LogUtils.d(TAG, "onClick view:" + view);
-            if (!mLight) {
-                try {
-                    if (getContext() != null) {
-                        ContentResolver contentResolver = getContext().getContentResolver();
-                        mLastBrightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessDefault);
-                        mLastMode = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                        LogUtils.d(TAG, "brightness " + (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL ? "manual" : "automatic") + " " + mLastBrightness + " -> " + mBrightnessMax);
-                        if (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                        }
-                        Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessMax);
-                    }
-                    mDarkView.setAlpha(calculateOverlayAlpha());
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            SystemProperties.set("config.write.one", HBM_PATH);
-                        }
-                    }, 20);
-
-                    mWindowManager.addView(mDarkView, mDarkLayoutParams);
-                    mWindowManager.addView(mLightView, mLightLayoutParams);
-                    mLight = true;
-                } catch (RuntimeException e) {
-                    LogUtils.e(TAG, "addView", e);
-                }
+        view.setOnClickListener(v -> {
+            LogUtils.d(TAG, "onClick view:" + v);
+            mDarkView.setAlpha(0.6f);
+            try {
+                mWindowManager.addView(mDarkView, mDarkLayoutParams);
+                mWindowManager.addView(mLightView, mLightLayoutParams);
+            } catch (RuntimeException e) {
+                LogUtils.e(TAG, "addView", e);
             }
-        }
-    };
 
-    private final View.OnClickListener mRemoveViewListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            LogUtils.d(TAG, "onClick view:" + view);
-            if (mLight) {
+            v.postDelayed(() -> {
                 try {
-                    SystemProperties.set("config.write.zero", HBM_PATH);
-                    if (getContext() != null) {
-                        ContentResolver contentResolver = getContext().getContentResolver();
-                        int brightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessDefault);
-                        if (brightness == mBrightnessMax) {
-                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mLastBrightness);
-                        } else {
-                            LogUtils.e(TAG, "brightness change");
-                        }
-                        if (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
-                        }
-                    }
-                    mDarkView.setAlpha(0f);
-
                     mWindowManager.removeView(mLightView);
                     mWindowManager.removeView(mDarkView);
-                    mLight = false;
                 } catch (RuntimeException e) {
                     LogUtils.e(TAG, "removeView", e);
                 }
-            }
-        }
-    };
-
-    @Override
-    public boolean onBackPressed() {
-        if (mLight) {
-            mRemoveViewListener.onClick(null);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private float calculateOverlayAlpha() {
-        float alpha = 0.3f;
-        if (mLastBrightness >= mBrightnessMin && mLastBrightness <= mBrightnessMax) {
-            alpha = 0.3f + 0.35f * (mBrightnessMax - mLastBrightness) / (mBrightnessMax - mBrightnessMin);
-        }
-        LogUtils.d(TAG, "calculateOverlayAlpha mLastBrightness:" + mLastBrightness + " alpha:" + alpha);
-        return alpha;
-    }
-
-    private void setTestView(View view) {
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ContentResolver contentResolver = v.getContext().getContentResolver();
-                mLastBrightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessDefault);
-                mLastMode = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                LogUtils.d(TAG, "brightness "
-                        + (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL ? "manual" : "automatic")
-                        + " " + mLastBrightness + " -> " + mBrightnessMax);
-                if (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                    Settings.System.putInt(contentResolver,
-                            Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                }
-                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessMax);
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        int brightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mBrightnessDefault);
-                        if (brightness == mBrightnessMax) {
-                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, mLastBrightness);
-                        } else {
-                            LogUtils.e(TAG, "brightness change");
-                        }
-                        if (mLastMode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                            Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
-                        }
-                    }
-                }, 8000);
-            }
+            }, 5000);
         });
     }
 }
