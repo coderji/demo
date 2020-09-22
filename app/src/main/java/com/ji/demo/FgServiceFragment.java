@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.ji.utils.LogUtils;
+import com.ji.util.Log;
 
 public class FgServiceFragment extends Fragment {
     private static final String TAG = "FgServiceFragment";
@@ -58,19 +58,19 @@ public class FgServiceFragment extends Fragment {
         @Override
         public void onCreate() {
             super.onCreate();
-            LogUtils.v(TAG, "onCreate");
+            Log.v(TAG, "onCreate");
         }
 
         @Override
         public void onDestroy() {
             super.onDestroy();
-            LogUtils.v(TAG, "onDestroy");
+            Log.v(TAG, "onDestroy");
         }
 
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
             super.onStartCommand(intent, flags, startId);
-            LogUtils.v(TAG, "onStartCommand flags:" + flags + " startId:" + startId);
+            Log.v(TAG, "onStartCommand flags:" + flags + " startId:" + startId);
 
             NotificationManager notificationManager = (NotificationManager)
                     getSystemService(Context.NOTIFICATION_SERVICE);

@@ -25,7 +25,7 @@ import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 import androidx.core.os.CancellationSignal;
 import androidx.fragment.app.Fragment;
 
-import com.ji.utils.LogUtils;
+import com.ji.util.Log;
 
 public class BiometricFragment extends Fragment {
     private static final String TAG = "BiometricFragment";
@@ -52,7 +52,7 @@ public class BiometricFragment extends Fragment {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LogUtils.d(TAG, "onClick view:" + view);
+                Log.d(TAG, "onClick view:" + view);
             }
         });
     }
@@ -77,7 +77,7 @@ public class BiometricFragment extends Fragment {
             @Override
             public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
                 super.onAuthenticationHelp(helpMsgId, helpString);
-                LogUtils.d(TAG, "OldAuthentication help: " + helpString);
+                Log.d(TAG, "OldAuthentication help: " + helpString);
             }
 
             @Override
@@ -187,7 +187,7 @@ public class BiometricFragment extends Fragment {
         mDarkView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                LogUtils.d(TAG, "surfaceCreated");
+                Log.d(TAG, "surfaceCreated");
                 Canvas canvas = holder.lockCanvas();
                 canvas.drawColor(Color.argb(0.6f, 0, 0, 0));
                 holder.unlockCanvasAndPost(canvas);
@@ -195,12 +195,12 @@ public class BiometricFragment extends Fragment {
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                LogUtils.d(TAG, "surfaceChanged");
+                Log.d(TAG, "surfaceChanged");
             }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                LogUtils.d(TAG, "surfaceDestroyed");
+                Log.d(TAG, "surfaceDestroyed");
             }
         });
         mDarkView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
@@ -220,13 +220,13 @@ public class BiometricFragment extends Fragment {
         mLightView.setBackgroundColor(Color.WHITE);
 
         view.setOnClickListener(v -> {
-            LogUtils.d(TAG, "onClick view:" + v);
+            Log.d(TAG, "onClick view:" + v);
             mDarkView.setAlpha(0.6f);
             try {
                 mWindowManager.addView(mDarkView, mDarkLayoutParams);
                 mWindowManager.addView(mLightView, mLightLayoutParams);
             } catch (RuntimeException e) {
-                LogUtils.e(TAG, "addView", e);
+                Log.e(TAG, "addView", e);
             }
 
             v.postDelayed(() -> {
@@ -234,7 +234,7 @@ public class BiometricFragment extends Fragment {
                     mWindowManager.removeView(mLightView);
                     mWindowManager.removeView(mDarkView);
                 } catch (RuntimeException e) {
-                    LogUtils.e(TAG, "removeView", e);
+                    Log.e(TAG, "removeView", e);
                 }
             }, 5000);
         });

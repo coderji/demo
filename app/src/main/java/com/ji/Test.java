@@ -4,8 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class TestUtils {
-    private static final String TAG = "TestUtils";
+public class Test {
+    private static final String TAG = "Test";
     private int mDisable = 1;
     private final Object mLock = new Object();
 
@@ -49,14 +49,12 @@ public class TestUtils {
     }
 
     public static void main(String[] args) {
-        TestUtils testUtils = new TestUtils();
+        Test testUtils = new Test();
         new Thread(() -> {
             testUtils.disable(0);
         }).start();
         sleep(50);
-        new Thread(() -> {
-            testUtils.recomputeDisableFlags();
-        }).start();
+        new Thread(testUtils::recomputeDisableFlags).start();
         sleep(1000);
         log("getDisabled:" + testUtils.getDisabled());
     }

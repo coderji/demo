@@ -1,4 +1,4 @@
-package com.ji.utils;
+package com.ji.util;
 
 import android.annotation.SuppressLint;
 import android.os.Debug;
@@ -7,8 +7,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class ReflectUtils {
-    private static final String TAG = "ReflectUtils";
+public class Reflect {
+    private static final String TAG = "Reflect";
 
     @SuppressLint("DiscouragedPrivateApi")
     public static String getCallers(final int depth) {
@@ -16,7 +16,7 @@ public class ReflectUtils {
             return (String) Debug.class.getDeclaredMethod("getCallers", int.class)
                     .invoke(null, depth);
         } catch (Exception e) {
-            LogUtils.e(TAG, "getCallers", e);
+            Log.e(TAG, "getCallers", e);
         }
         return null;
     }
@@ -27,7 +27,7 @@ public class ReflectUtils {
             method.setAccessible(true);
             return method;
         } catch (NoSuchMethodException e) {
-            LogUtils.e(TAG, "getMethod", e);
+            Log.e(TAG, "getMethod", e);
         }
         return null;
     }
@@ -36,7 +36,7 @@ public class ReflectUtils {
         try {
             return getMethod(Class.forName(cls), methodName, parameterTypes);
         } catch (ClassNotFoundException e) {
-            LogUtils.e(TAG, "getMethod", e);
+            Log.e(TAG, "getMethod", e);
         }
         return null;
     }
@@ -46,7 +46,7 @@ public class ReflectUtils {
             try {
                 return method.invoke(receiver, args);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                LogUtils.e(TAG, "invoke", e);
+                Log.e(TAG, "invoke", e);
             }
         }
         return null;
@@ -58,7 +58,7 @@ public class ReflectUtils {
             field.setAccessible(true);
             return field.get(receiver);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            LogUtils.e(TAG, "getField", e);
+            Log.e(TAG, "getField", e);
         }
         return null;
     }
@@ -67,7 +67,7 @@ public class ReflectUtils {
         try {
             return getField(Class.forName(cls), fieldName, receiver);
         } catch (ClassNotFoundException e) {
-            LogUtils.e(TAG, "getField", e);
+            Log.e(TAG, "getField", e);
         }
         return null;
     }
@@ -78,7 +78,7 @@ public class ReflectUtils {
             field.setAccessible(true);
             field.set(receiver, value);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            LogUtils.e(TAG, "setField", e);
+            Log.e(TAG, "setField", e);
         }
     }
 
@@ -86,7 +86,7 @@ public class ReflectUtils {
         try {
             setField(Class.forName(cls), fieldName, receiver, value);
         } catch (ClassNotFoundException e) {
-            LogUtils.e(TAG, "setField", e);
+            Log.e(TAG, "setField", e);
         }
     }
 }
