@@ -24,5 +24,13 @@
         </activity>
 
         <service android:name="com.ji.demo.FgServiceFragment$FgService"/>
+
+        <service
+                android:name="com.ji.demo.CallScreeningServiceImpl"
+                android:permission="android.permission.BIND_SCREENING_SERVICE">
+            <intent-filter>
+                <action android:name="android.telecom.CallScreeningService"/>
+            </intent-filter>
+        </service>
     </application>
 </manifest>
