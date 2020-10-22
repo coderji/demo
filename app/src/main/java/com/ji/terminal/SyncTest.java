@@ -1,11 +1,11 @@
-package com.ji;
+package com.ji.terminal;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Test {
-    private static final String TAG = "Test";
+public class SyncTest {
+    private static final String TAG = "SyncTest";
     private int mDisable = 1;
     private final Object mLock = new Object();
 
@@ -49,7 +49,7 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        Test testUtils = new Test();
+        SyncTest testUtils = new SyncTest();
         new Thread(() -> {
             testUtils.disable(0);
         }).start();
