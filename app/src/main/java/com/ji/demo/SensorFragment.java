@@ -16,10 +16,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.ji.util.Log;
 
+import java.util.List;
+
 public class SensorFragment extends Fragment {
     private static final String TAG = "SensorFragment";
     private TextView mTextView;
     private ProximityCheck mProximityCheck;
+    private CapMulCheck mCapMulCheck;
 
     @Nullable
     @Override
@@ -33,14 +36,9 @@ public class SensorFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mTextView = view.findViewById(R.id.sensor_info);
-        mProximityCheck = new ProximityCheck(view.getContext(), new Handler()) {
-            @Override
-            public void onResult(boolean isNear) {
-                mTextView.setText("isNear " + isNear);
-            }
-        };
-        view.findViewById(R.id.sensor_register).setOnClickListener((v) -> mProximityCheck.register());
-        view.findViewById(R.id.sensor_unregister).setOnClickListener((v) -> mProximityCheck.unregister());
+        mCapMulCheck = new CapMulCheck(view.getContext(), new Handler());
+        view.findViewById(R.id.sensor_register).setOnClickListener((v) -> mCapMulCheck.register());
+        view.findViewById(R.id.sensor_unregister).setOnClickListener((v) -> mCapMulCheck.unregister());
     }
 
     private static class ProximityCheck {
@@ -50,11 +48,9 @@ public class SensorFragment extends Fragment {
             public void onSensorChanged(SensorEvent event) {
                 if (event.values.length == 0) {
                     Log.w(TAG, "ProximityCheck Event has no values!");
-                    onResult(false);
                 } else {
                     boolean isNear = event.values[0] == 0;
                     Log.d(TAG, "ProximityCheck isNear:" + isNear);
-                    onResult(isNear);
                 }
             }
 
@@ -65,10 +61,6 @@ public class SensorFragment extends Fragment {
         };
         private final Handler mHandler;
         private boolean mRegistered;
-
-        public void onResult(boolean isNear) {
-
-        }
 
         ProximityCheck(Context context, Handler handler) {
             mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -86,6 +78,55 @@ public class SensorFragment extends Fragment {
 
         public void unregister() {
             Log.d(TAG, "ProximityCheck unregister");
+            if (mRegistered) {
+                mRegistered = false;
+                mSensorManager.unregisterListener(mSensorEventListener);
+            }
+        }
+    }
+
+    private static class CapMulCheck {
+        private final int CAP_ID = 0x10010;
+        private final SensorManager mSensorManager;
+        private final SensorEventListener mSensorEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if (event.values.length == 0) {
+                    Log.w(TAG, "CapMulCheck Event has no values!");
+                } else {
+                    boolean isNear = event.values[0] == 0;
+                    Log.d(TAG, "CapMulCheck " + event.sensor.getName() + " " + event.values[0]);
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+            }
+        };
+        private final Handler mHandler;
+        private boolean mRegistered;
+
+        CapMulCheck(Context context, Handler handler) {
+            mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            mHandler = handler;
+        }
+
+        public void register() {
+            Log.d(TAG, "CapsenseMulCheck register");
+            if (!mRegistered) {
+                mRegistered = true;
+                List<Sensor> sensorList = mSensorManager.getSensorList(CAP_ID);
+                int size = sensorList == null ? 0 : sensorList.size();
+                for (int i = 0; i < size; i++) {
+                    mSensorManager.registerListener(mSensorEventListener,
+                            sensorList.get(i), SensorManager.SENSOR_DELAY_NORMAL, mHandler);
+                }
+            }
+        }
+
+        public void unregister() {
+            Log.d(TAG, "CapsenseMulCheck unregister");
             if (mRegistered) {
                 mRegistered = false;
                 mSensorManager.unregisterListener(mSensorEventListener);
