@@ -48,7 +48,7 @@ public class SyncTest {
                 + " " + TAG + ": " + s);
     }
 
-    public static void main(String[] args) {
+    public static int main(String[] args) {
         SyncTest testUtils = new SyncTest();
         new Thread(() -> {
             testUtils.disable(0);
@@ -57,5 +57,6 @@ public class SyncTest {
         new Thread(testUtils::recomputeDisableFlags).start();
         sleep(1000);
         log("getDisabled:" + testUtils.getDisabled());
+        return 0;
     }
 }
