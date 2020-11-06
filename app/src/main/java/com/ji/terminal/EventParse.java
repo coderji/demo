@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class EventUtil {
+public class EventParse {
     private static final String TAG = "EventUtil";
 
     private static String eventToString(String event) {
