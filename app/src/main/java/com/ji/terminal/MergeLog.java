@@ -10,72 +10,57 @@ public class MergeLog {
     private static String mPath;
     private static volatile String[] mLines;
     private static Object[] mLocks;
-    private static FileWriter mFw;
-    private static BufferedWriter mBw;
-    private static char[] FILTER = new char[]{'c', 'e', 'k', 'm', 'r', 's'};
 
-    private static void mergeFile(String path, int attributes) {
-        if (V) log("mergeFile path:" + path + " attributes:" + Integer.toBinaryString(attributes));
+    private static void mergeFile(String path) {
+        log("mergeFile path:" + path);
         mPath = path + (path.endsWith(File.separator) ? "" : File.separator);
-
         File directory = new File(path);
         if (directory.exists() && directory.isDirectory()) {
-            HashMap<String, Integer> map = new HashMap<>();
+            HashMap<String, String> map = new HashMap<>();
             for (String name : Objects.requireNonNull(directory.list())) {
-                if (name.contains("-e.txt")) {
+                if (name.endsWith("-e.txt")) {
                     String key = name.substring(0, name.indexOf("-e.txt"));
-                    Integer attr = map.get(key);
-                    map.put(key, attr == null ? _E : attr | _E);
-                } else if (name.contains("-m.txt")) {
+                    map.put(key, map.getOrDefault(key, "") + "-e");
+                } else if (name.endsWith("-m.txt")) {
                     String key = name.substring(0, name.indexOf("-m.txt"));
-                    Integer attr = map.get(key);
-                    map.put(key, attr == null ? _M : attr | _M);
-                } else if (name.contains("-s.txt")) {
+                    map.put(key, map.getOrDefault(key, "") + "-m");
+                } else if (name.endsWith("-r.txt")) {
+                    String key = name.substring(0, name.indexOf("-r.txt"));
+                    map.put(key, map.getOrDefault(key, "") + "-r");
+                } else if (name.endsWith("-s.txt")) {
                     String key = name.substring(0, name.indexOf("-s.txt"));
-                    Integer attr = map.get(key);
-                    map.put(key, attr == null ? _S : attr | _S);
+                    map.put(key, map.getOrDefault(key, "") + "-s");
                 }
             }
             for (String key : map.keySet()) {
-                Integer attr = map.get(key);
-                if (attr != null && (attr & _E) != 0 && (attr & _M) != 0 && (attr & _S) != 0) {
-                    mergeFile(key, new String[]{key + "-e.txt", key + "-m.txt", key + "-s.txt"});
-                }
+                mergeFile(key, Objects.requireNonNull(map.getOrDefault(key, "")));
             }
+        } else {
+            log("mergeFile get directory fail");
         }
     }
 
-    private static void mergeFile(String name, String[] names) {
-        if (V) log("mergeFile names:" + Arrays.toString(names));
-        try {
-            mFw = new FileWriter(mPath + name + "-all.txt");
-            mBw = new BufferedWriter(mFw);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        mLines = new String[names.length];
-        mLocks = new Object[names.length];
-        for (int i = 0; i < names.length; i++) {
+    private static void mergeFile(String name, String attr) {
+        String[] attrs = attr.substring(1).split("-");
+        log("mergeFile name:" + name + " attrs:" + Arrays.toString(attrs));
+        mLines = new String[attrs.length];
+        mLocks = new Object[attrs.length];
+        for (int i = 0; i < attrs.length; i++) {
             mLines[i] = "begin";
             mLocks[i] = new Object();
         }
-        for (int i = 0; i < names.length; i++) {
-            new Thread(new FileRunnable(i, names[i])).start();
-        }
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        while (merge() == 0) {
+        for (int i = 0; i < attrs.length; i++) {
+            new Thread(new FileRunnable(i, name, attrs[i])).start();
         }
         try {
-            mBw.flush();
-            mBw.close();
-            mFw.close();
+            FileWriter fw = new FileWriter(mPath + name + "-all.txt");
+            BufferedWriter bw = new BufferedWriter(fw);
+            while (true) {
+                if (!merge(bw)) break;
+            }
+            bw.flush();
+            bw.close();
+            fw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,27 +69,29 @@ public class MergeLog {
     private static class FileRunnable implements Runnable {
         int index;
         String name;
+        String attr;
 
-        public FileRunnable(int index, String name) {
+        public FileRunnable(int index, String name, String attr) {
             this.index = index;
             this.name = name;
+            this.attr = attr;
         }
 
         @Override
         public void run() {
-            if (V) log("[" + index + "] run");
+            log("[" + index + "] run");
             try {
-                FileReader fr = new FileReader(mPath + name);
+                FileReader fr = new FileReader(mPath + name + "-" + attr + ".txt");
                 BufferedReader br = new BufferedReader(fr);
                 int line = 0;
                 while (br.ready()) {
                     line++;
                     mLines[index] = br.readLine();
-                    log("[" + index + "] line" + line + " " + mLines[index]);
+                    if (V) log("[" + index + "] line" + line + " " + mLines[index]);
 
                     // wait for compare and merge
                     synchronized (mLocks[index]) {
-                        log("[" + index + "] wait");
+                        if (V) log("[" + index + "] wait");
                         try {
                             mLocks[index].wait();
                         } catch (InterruptedException e) {
@@ -121,8 +108,7 @@ public class MergeLog {
         }
     }
 
-    private synchronized static int merge() {
-        if (V) log("merge" + " " + Arrays.toString(mLines));
+    private static synchronized boolean merge(BufferedWriter bw) throws IOException {
         int begin = 0, end = 0, index = 0, number = 0;
         for (int i = 0; i < mLines.length; i++) {
             if ("begin".equals(mLines[i])) {
@@ -134,12 +120,12 @@ public class MergeLog {
                 index = i;
             }
         }
-        log("merge all:" + mLines.length + " begin:" + begin + " end:" + end + " number:"+ number + " index:" + index);
+        if (V) log("merge all:" + mLines.length + " begin:" + begin + " end:" + end + " number:"+ number + " index:" + index);
         if (begin > 0) {
-            log("merge wait begin");
+            if (V) log("merge wait begin");
         } else if (end == mLocks.length) {
             log("merge done");
-            return -1;
+            return false;
         } else {
             if (number > 1) {
                 for (int i = index - 1; i >= 0; i--) {
@@ -148,19 +134,15 @@ public class MergeLog {
                     }
                 }
             }
-            try {
-                log("merge write [" + index + "] " + mLines[index]);
-                mBw.write(mLines[index]);
-                mBw.newLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            if (V) log("merge write [" + index + "] " + mLines[index]);
+            bw.write(mLines[index]);
+            bw.newLine();
             synchronized (mLocks[index]) {
-                log("merge notify [" + index + "]");
+                if (V) log("merge notify [" + index + "]");
                 mLocks[index].notify();
             }
         }
-        return 0;
+        return true;
     }
 
     private static int compare(String a, String b) {
@@ -182,35 +164,10 @@ public class MergeLog {
 
     public static int main(String[] args) {
         if (args == null || args.length != 1) {
-            System.out.println("Usage: java -jar app.jar [option] [directory]\noption:\n    -e: event\n    -m: mobile \n    ... \n    detail see logcat filter");
+            System.out.println("Usage: java -jar app.jar [directory]");
         } else {
-            String path = "";
-            int attributes = 0;
-            for (String arg : args) {
-                if (arg.startsWith("-")) {
-                    for (int i = 1; i < arg.length(); i++) {
-                        if (arg.charAt(i) == 'c') {
-                            attributes = attributes | _C;
-                        } else if (arg.charAt(i) == 'e') {
-                            attributes = attributes | _E;
-                        } else if (arg.charAt(i) == 'k') {
-                            attributes = attributes | _K;
-                        } else if (arg.charAt(i) == 'm') {
-                            attributes = attributes | _M;
-                        } else if (arg.charAt(i) == 'R') {
-                            attributes = attributes | _R;
-                        } else if (arg.charAt(i) == 'S') {
-                            attributes = attributes | _S;
-                        } else {
-                            System.out.println("what are you doing?");
-                        }
-                    }
-                } else {
-                    path = arg;
-                }
-            }
             long begin = System.currentTimeMillis();
-            mergeFile(path, attributes);
+            mergeFile(args[0]);
             long end = System.currentTimeMillis();
             log("mergeFile time:" + (end - begin) / 1000);
         }
