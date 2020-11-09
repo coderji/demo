@@ -69,11 +69,6 @@ public class MergeLog {
             BufferedWriter bw = new BufferedWriter(fw);
 
             while (true) {
-                for (int i = 0; i < attrs.length; i++) {
-                    if (i != minIndex && strings[i] != null && compare(strings[i], strings[minIndex]) < 0) {
-                        minIndex = i;
-                    }
-                }
                 if (V) log("mergeFile write " + attrs[minIndex] + " " + attrLines[minIndex]);
                 bw.write(strings[minIndex]);
                 bw.newLine();
@@ -81,6 +76,11 @@ public class MergeLog {
                 if (brs[minIndex].ready()) {
                     strings[minIndex] = brs[minIndex].readLine();
                     attrLines[minIndex]++;
+                    for (int i = 0; i < attrs.length; i++) {
+                        if (i != minIndex && strings[i] != null && compare(strings[i], strings[minIndex]) < 0) {
+                            minIndex = i;
+                        }
+                    }
                 } else {
                     log("mergeFile " + attrs[minIndex] + " done");
                     strings[minIndex] = null;
