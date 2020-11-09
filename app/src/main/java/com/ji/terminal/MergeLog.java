@@ -7,13 +7,12 @@ import java.util.*;
 public class MergeLog {
     private static final String TAG = "MergeLog";
     private static boolean V = false;
-    private static String mPath;
-    private static volatile String[] mLines;
-    private static Object[] mLocks;
 
     private static void mergeFile(String path) {
         log("mergeFile path:" + path);
-        mPath = path + (path.endsWith(File.separator) ? "" : File.separator);
+        if (!path.endsWith(File.separator)) {
+            path = path + File.separator;
+        }
         File directory = new File(path);
         if (directory.exists() && directory.isDirectory()) {
             HashMap<String, String> map = new HashMap<>();
@@ -33,30 +32,74 @@ public class MergeLog {
                 }
             }
             for (String key : map.keySet()) {
-                mergeFile(key, Objects.requireNonNull(map.getOrDefault(key, "")));
+                mergeFile(path, key, Objects.requireNonNull(map.getOrDefault(key, "")));
             }
         } else {
             log("mergeFile get directory fail");
         }
     }
 
-    private static void mergeFile(String name, String attr) {
+    private static void mergeFile(String path, String name, String attr) {
         String[] attrs = attr.substring(1).split("-");
         log("mergeFile name:" + name + " attrs:" + Arrays.toString(attrs));
-        mLines = new String[attrs.length];
-        mLocks = new Object[attrs.length];
-        for (int i = 0; i < attrs.length; i++) {
-            mLines[i] = "begin";
-            mLocks[i] = new Object();
-        }
-        for (int i = 0; i < attrs.length; i++) {
-            new Thread(new FileRunnable(i, name, attrs[i])).start();
-        }
+        FileReader[] frs = new FileReader[attrs.length];
+        BufferedReader[] brs = new BufferedReader[attrs.length];
+        String[] strings = new String[attrs.length];
+        int[] attrLines = new int[attrs.length];
+        int mergeLine = 0;
         try {
-            FileWriter fw = new FileWriter(mPath + name + "-all.txt");
+            int minIndex = 0;
+            for (int i = 0; i < attrs.length; i++) {
+                frs[i] = new FileReader(path + name + "-" + attrs[i] + ".txt");
+                brs[i] = new BufferedReader(frs[i]);
+                if (brs[i].ready()) {
+                    strings[i] = brs[i].readLine();
+                    attrLines[i] = 1;
+                    if (i != minIndex && compare(strings[i], strings[minIndex]) < 0) {
+                        minIndex = i;
+                    }
+                } else {
+                    log("mergeFile " + attrs[i] + " not ready");
+                    brs[i].close();
+                    frs[i].close();
+                    attrLines[i] = 0;
+                }
+            }
+            FileWriter fw = new FileWriter(path + name + "-all.txt");
             BufferedWriter bw = new BufferedWriter(fw);
+
             while (true) {
-                if (!merge(bw)) break;
+                for (int i = 0; i < attrs.length; i++) {
+                    if (i != minIndex && strings[i] != null && compare(strings[i], strings[minIndex]) < 0) {
+                        minIndex = i;
+                    }
+                }
+                if (V) log("mergeFile write " + attrs[minIndex] + " " + attrLines[minIndex]);
+                bw.write(strings[minIndex]);
+                bw.newLine();
+                mergeLine++;
+                if (brs[minIndex].ready()) {
+                    strings[minIndex] = brs[minIndex].readLine();
+                    attrLines[minIndex]++;
+                } else {
+                    log("mergeFile " + attrs[minIndex] + " done");
+                    strings[minIndex] = null;
+                    brs[minIndex].close();
+                    frs[minIndex].close();
+                    for (int i = 0; i < attrs.length; i++) {
+                        if (strings[i] != null) {
+                            minIndex = i;
+                        }
+                    }
+                    if (strings[minIndex] == null) {
+                        break;
+                    }
+                    for (int i = 0; i < attrs.length; i++) {
+                        if (i != minIndex && strings[i] != null && compare(strings[i], strings[minIndex]) < 0) {
+                            minIndex = i;
+                        }
+                    }
+                }
             }
             bw.flush();
             bw.close();
@@ -64,94 +107,22 @@ public class MergeLog {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private static class FileRunnable implements Runnable {
-        int index;
-        String name;
-        String attr;
-
-        public FileRunnable(int index, String name, String attr) {
-            this.index = index;
-            this.name = name;
-            this.attr = attr;
+        int allLine = 0;
+        StringBuilder stringBuilder = new StringBuilder("mergeFile ");
+        for (int i = 0; i < attrs.length; i++) {
+            allLine = allLine + attrLines[i];
+            stringBuilder.append(attrs[i]).append(":").append(attrLines[i]).append(" ");
         }
-
-        @Override
-        public void run() {
-            log("[" + index + "] run");
-            try {
-                FileReader fr = new FileReader(mPath + name + "-" + attr + ".txt");
-                BufferedReader br = new BufferedReader(fr);
-                int line = 0;
-                while (br.ready()) {
-                    line++;
-                    mLines[index] = br.readLine();
-                    if (V) log("[" + index + "] line" + line + " " + mLines[index]);
-
-                    // wait for compare and merge
-                    synchronized (mLocks[index]) {
-                        if (V) log("[" + index + "] wait");
-                        try {
-                            mLocks[index].wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                mLines[index] = "end";
-                br.close();
-                fr.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private static synchronized boolean merge(BufferedWriter bw) throws IOException {
-        int begin = 0, end = 0, index = 0, number = 0;
-        for (int i = 0; i < mLines.length; i++) {
-            if ("begin".equals(mLines[i])) {
-                begin++;
-            } else if ("end".equals(mLines[i])) {
-                end++;
-            } else {
-                number++;
-                index = i;
-            }
-        }
-        if (V) log("merge all:" + mLines.length + " begin:" + begin + " end:" + end + " number:"+ number + " index:" + index);
-        if (begin > 0) {
-            if (V) log("merge wait begin");
-        } else if (end == mLocks.length) {
-            log("merge done");
-            return false;
-        } else {
-            if (number > 1) {
-                for (int i = index - 1; i >= 0; i--) {
-                    if (!"begin".equals(mLines[i]) && !"end".equals(mLines[i]) && compare(mLines[i], mLines[index]) < 0) {
-                        index = i;
-                    }
-                }
-            }
-            if (V) log("merge write [" + index + "] " + mLines[index]);
-            bw.write(mLines[index]);
-            bw.newLine();
-            synchronized (mLocks[index]) {
-                if (V) log("merge notify [" + index + "]");
-                mLocks[index].notify();
-            }
-        }
-        return true;
+        stringBuilder.append("allLine:").append(allLine).append(" mergeLine:").append(mergeLine);
+        log(stringBuilder.toString());
     }
 
     private static int compare(String a, String b) {
-        if (V) log("compare \n\t\ta:" + a + "\n\t\tb:" + b);
         for (int i = 0; i < 18 /* format date */ && i < a.length() && i < b.length(); i++) {
             if (a.charAt(i) > b.charAt(i)) {
                 return 1;
             } else if (a.charAt(i) < b.charAt(i)) {
-                return -1;
+                return  -1;
             }
         }
         return 0;
