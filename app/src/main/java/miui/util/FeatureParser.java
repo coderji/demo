@@ -1,8 +1,8 @@
 package miui.util;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
+
+import com.ji.util.Log;
 
 public class FeatureParser {
     private static final String TAG = "FeatureParser";

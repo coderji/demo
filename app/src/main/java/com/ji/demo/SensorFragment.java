@@ -11,9 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.ji.util.Log;
 
 import java.util.List;
@@ -36,9 +38,10 @@ public class SensorFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mTextView = view.findViewById(R.id.sensor_info);
+        mProximityCheck = new ProximityCheck(view.getContext(), new Handler());
         mCapMulCheck = new CapMulCheck(view.getContext(), new Handler());
-        view.findViewById(R.id.sensor_register).setOnClickListener((v) -> mCapMulCheck.register());
-        view.findViewById(R.id.sensor_unregister).setOnClickListener((v) -> mCapMulCheck.unregister());
+        view.findViewById(R.id.sensor_register).setOnClickListener((v) -> mProximityCheck.register());
+        view.findViewById(R.id.sensor_unregister).setOnClickListener((v) -> mProximityCheck.unregister());
     }
 
     private static class ProximityCheck {

@@ -3,6 +3,7 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="com.ji.demo">
 
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions"/>
@@ -26,7 +27,7 @@
         <service android:name="com.ji.demo.FgServiceFragment$FgService"/>
 
         <service
-                android:name="com.ji.demo.CallScreeningServiceImpl"
+                android:name="com.ji.demo.TelephonyFragment$CallScreeningServiceImpl"
                 android:permission="android.permission.BIND_SCREENING_SERVICE">
             <intent-filter>
                 <action android:name="android.telecom.CallScreeningService"/>
