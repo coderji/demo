@@ -5,12 +5,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,9 +22,8 @@ import java.util.List;
 
 public class SensorFragment extends Fragment {
     private static final String TAG = "SensorFragment";
-    private TextView mTextView;
     private ProximityCheck mProximityCheck;
-    private CapMulCheck mCapMulCheck;
+    private SarCheck mCapMulCheck;
 
     @Nullable
     @Override
@@ -37,11 +36,10 @@ public class SensorFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mTextView = view.findViewById(R.id.sensor_info);
         mProximityCheck = new ProximityCheck(view.getContext(), new Handler());
-        mCapMulCheck = new CapMulCheck(view.getContext(), new Handler());
-        view.findViewById(R.id.sensor_register).setOnClickListener((v) -> mProximityCheck.register());
-        view.findViewById(R.id.sensor_unregister).setOnClickListener((v) -> mProximityCheck.unregister());
+        mCapMulCheck = new SarCheck(view.getContext(), new Handler());
+        view.findViewById(R.id.sensor_register).setOnClickListener((v) -> mCapMulCheck.register());
+        view.findViewById(R.id.sensor_unregister).setOnClickListener((v) -> mCapMulCheck.unregister());
     }
 
     private static class ProximityCheck {
@@ -88,17 +86,17 @@ public class SensorFragment extends Fragment {
         }
     }
 
-    private static class CapMulCheck {
-        private final int CAP_ID = 0x10010;
+    private static class SarCheck {
+        private final int SAR_ID = "capri".equals(Build.DEVICE) ? 0x10010 : 0x10030;
         private final SensorManager mSensorManager;
         private final SensorEventListener mSensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 if (event.values.length == 0) {
-                    Log.w(TAG, "CapMulCheck Event has no values!");
+                    Log.w(TAG, "SarCheck Event has no values!");
                 } else {
                     boolean isNear = event.values[0] == 0;
-                    Log.d(TAG, "CapMulCheck " + event.sensor.getName() + " " + event.values[0]);
+                    Log.d(TAG, "SarCheck " + event.sensor.getName() + " " + event.values[0]);
                 }
             }
 
@@ -110,17 +108,18 @@ public class SensorFragment extends Fragment {
         private final Handler mHandler;
         private boolean mRegistered;
 
-        CapMulCheck(Context context, Handler handler) {
+        SarCheck(Context context, Handler handler) {
             mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
             mHandler = handler;
         }
 
         public void register() {
-            Log.d(TAG, "CapsenseMulCheck register");
+            Log.d(TAG, "SarCheck register");
             if (!mRegistered) {
                 mRegistered = true;
-                List<Sensor> sensorList = mSensorManager.getSensorList(CAP_ID);
+                List<Sensor> sensorList = mSensorManager.getSensorList(SAR_ID);
                 int size = sensorList == null ? 0 : sensorList.size();
+                Log.d(TAG, "SarCheck sensorList:" + sensorList);
                 for (int i = 0; i < size; i++) {
                     mSensorManager.registerListener(mSensorEventListener,
                             sensorList.get(i), SensorManager.SENSOR_DELAY_NORMAL, mHandler);
@@ -129,7 +128,7 @@ public class SensorFragment extends Fragment {
         }
 
         public void unregister() {
-            Log.d(TAG, "CapsenseMulCheck unregister");
+            Log.d(TAG, "SarCheck unregister");
             if (mRegistered) {
                 mRegistered = false;
                 mSensorManager.unregisterListener(mSensorEventListener);
