@@ -23,7 +23,7 @@ import java.util.List;
 public class SensorFragment extends Fragment {
     private static final String TAG = "SensorFragment";
     private ProximityCheck mProximityCheck;
-    private SarCheck mCapMulCheck;
+    private SarCheck mSarCheck;
 
     @Nullable
     @Override
@@ -37,9 +37,9 @@ public class SensorFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mProximityCheck = new ProximityCheck(view.getContext(), new Handler());
-        mCapMulCheck = new SarCheck(view.getContext(), new Handler());
-        view.findViewById(R.id.sensor_register).setOnClickListener((v) -> mCapMulCheck.register());
-        view.findViewById(R.id.sensor_unregister).setOnClickListener((v) -> mCapMulCheck.unregister());
+        mSarCheck = new SarCheck(view.getContext(), new Handler());
+        view.findViewById(R.id.sensor_register).setOnClickListener((v) -> mSarCheck.register());
+        view.findViewById(R.id.sensor_unregister).setOnClickListener((v) -> mSarCheck.unregister());
     }
 
     private static class ProximityCheck {
@@ -87,7 +87,6 @@ public class SensorFragment extends Fragment {
     }
 
     private static class SarCheck {
-        private final int SAR_ID = "capri".equals(Build.DEVICE) ? 0x10010 : 0x10030;
         private final SensorManager mSensorManager;
         private final SensorEventListener mSensorEventListener = new SensorEventListener() {
             @Override
@@ -114,15 +113,23 @@ public class SensorFragment extends Fragment {
         }
 
         public void register() {
-            Log.d(TAG, "SarCheck register");
+            Log.d(TAG, "SarCheck register, device:" + Build.DEVICE);
             if (!mRegistered) {
                 mRegistered = true;
-                List<Sensor> sensorList = mSensorManager.getSensorList(SAR_ID);
-                int size = sensorList == null ? 0 : sensorList.size();
-                Log.d(TAG, "SarCheck sensorList:" + sensorList);
-                for (int i = 0; i < size; i++) {
-                    mSensorManager.registerListener(mSensorEventListener,
-                            sensorList.get(i), SensorManager.SENSOR_DELAY_NORMAL, mHandler);
+                if ("capri".equals(Build.DEVICE)) {
+                    List<Sensor> sensorList = mSensorManager.getSensorList(0x10010);
+                    int size = sensorList == null ? 0 : sensorList.size();
+                    Log.d(TAG, "SarCheck sensorList:" + sensorList);
+                    for (int i = 0; i < size; i++) {
+                        mSensorManager.registerListener(mSensorEventListener,
+                                sensorList.get(i), SensorManager.SENSOR_DELAY_NORMAL, mHandler);
+                    }
+                } else if ("P352".equals(Build.DEVICE)) {
+                    Sensor topSar = mSensorManager.getDefaultSensor(0x10030);
+                    mSensorManager.registerListener(mSensorEventListener, topSar, SensorManager.SENSOR_DELAY_NORMAL, mHandler);
+
+                    Sensor bottomSar = mSensorManager.getDefaultSensor(0x10031);
+                    mSensorManager.registerListener(mSensorEventListener, bottomSar, SensorManager.SENSOR_DELAY_NORMAL, mHandler);
                 }
             }
         }
