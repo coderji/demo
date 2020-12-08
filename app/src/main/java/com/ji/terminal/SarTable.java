@@ -8,13 +8,16 @@ public class SarTable {
     private static int mModemTable = 0, mModemTableEasy = 0, mWifiTable = 0, mWifiTableEasy = 0;
     private static boolean mRfPort = false, mConnected = false,  mEarpiece = false;
     private static boolean mTopSensorActive = false, mBottomSensorActive= false, mHotspot = false;
-    private static boolean mWLAN = false, mWWAN = false;
+    private static boolean mSensorAvailable = false;
     private static final int RF = 1 << 0;
     private static final int CONNECTED = 1 << 1;
     private static final int EARPIECE = 1 << 2;
     private static final int TOP = 1 << 3;
     private static final int BOTTOM = 1 << 4;
     private static final int HOTSPOT = 1 << 5;
+    private static final int SENSOR = 1 << 6;
+
+    private static boolean mWLAN = false, mWWAN = false;
     private static final int WLAN = 1 << 0;
     private static final int WWAN = 1 << 1;
 
@@ -27,13 +30,13 @@ public class SarTable {
                 if (mEarpiece) {
                     table = 2;
                 } else {
-                    if (mTopSensorActive && mBottomSensorActive) {
+                    if (mSensorAvailable && mTopSensorActive && mBottomSensorActive) {
                         table = 3;
                     } else {
                         if (mHotspot) {
                             table = 7;
                         } else {
-                            if (!mTopSensorActive && mBottomSensorActive) {
+                            if (mSensorAvailable && !mTopSensorActive && mBottomSensorActive) {
                                 table = 6;
                             } else {
                                 table = 4;
@@ -52,11 +55,11 @@ public class SarTable {
             table = 1;
         } else if (!mRfPort && mConnected && mEarpiece) {
             table = 2;
-        } else if (!mRfPort && mConnected && !mEarpiece && mTopSensorActive && mBottomSensorActive) {
+        } else if (!mRfPort && mConnected && !mEarpiece && mSensorAvailable && mTopSensorActive && mBottomSensorActive) {
             table = 3;
         } else if (!mRfPort && mConnected && !mEarpiece && !mBottomSensorActive && !mHotspot) {
             table = 4;
-        } else if (!mRfPort && mConnected && !mEarpiece && !mTopSensorActive && mBottomSensorActive && !mHotspot) {
+        } else if (!mRfPort && mConnected && !mEarpiece && mSensorAvailable && !mTopSensorActive && mBottomSensorActive && !mHotspot) {
             table = 6;
         } else if (!mRfPort && mConnected && !mEarpiece && !(mTopSensorActive && mBottomSensorActive) && mHotspot) {
             table = 7;
@@ -65,13 +68,18 @@ public class SarTable {
     }
 
     private static void checkModemTable() {
-        for (int state = 0; state <= (RF | CONNECTED | EARPIECE | TOP | BOTTOM | HOTSPOT); state++) {
+        for (int state = 0; state <= (RF | CONNECTED | EARPIECE | TOP | BOTTOM | HOTSPOT | SENSOR); state++) {
             mRfPort = (state & RF) == RF;
             mConnected = (state & CONNECTED) == CONNECTED;
             mEarpiece = (state & EARPIECE) == EARPIECE;
             mTopSensorActive = (state & TOP) == TOP;
             mBottomSensorActive = (state & BOTTOM) == BOTTOM;
             mHotspot = (state & HOTSPOT) == HOTSPOT;
+            mSensorAvailable = (state & SENSOR) == SENSOR;
+            if (!mSensorAvailable) {
+                mTopSensorActive = false;
+                mBottomSensorActive = false;
+            }
             mModemTable = findModemTable();
             mModemTableEasy = findModemTableEasy();
             if (mModemTable == mModemTableEasy) {
@@ -111,7 +119,7 @@ public class SarTable {
             if (mEarpiece) {
                 table = 4;
             } else {
-                if (mTopSensorActive && mBottomSensorActive) {
+                if (mSensorAvailable && mTopSensorActive && mBottomSensorActive) {
                     table = 6;
                 } else {
                     if (mHotspot) {
@@ -127,24 +135,29 @@ public class SarTable {
         int table = 0;
         if (mWLAN && !mEarpiece && !mTopSensorActive && !mBottomSensorActive && !mHotspot) {
             table = 0;
-        } else if (mWLAN && !mEarpiece /*&& !mTopSensorActive && !mBottomSensorActive*/ && mHotspot) {
+        } else if (mWLAN && !mEarpiece && !(mTopSensorActive && mBottomSensorActive) && mHotspot) { // Special Table
             table = 2;
         } else if (mWLAN && mEarpiece) {
             table = 4;
-        } else if (mWLAN && !mEarpiece && mTopSensorActive && mBottomSensorActive) {
+        } else if (mWLAN && !mEarpiece && mSensorAvailable && mTopSensorActive && mBottomSensorActive) {
             table = 6;
         }
         return table;
     }
 
     private static void checkWifiTable() {
-        for (int state = 0; state <= (WLAN | WWAN | EARPIECE | TOP | BOTTOM | HOTSPOT); state++) {
+        for (int state = 0; state <= (WLAN | WWAN | EARPIECE | TOP | BOTTOM | HOTSPOT | SENSOR); state++) {
             mWLAN = (state & WLAN) == WLAN;
             mWWAN = (state & WWAN) == WWAN;
             mEarpiece = (state & EARPIECE) == EARPIECE;
             mTopSensorActive = (state & TOP) == TOP;
             mBottomSensorActive = (state & BOTTOM) == BOTTOM;
             mHotspot = (state & HOTSPOT) == HOTSPOT;
+            mSensorAvailable = (state & SENSOR) == SENSOR;
+            if (!mSensorAvailable) {
+                mTopSensorActive = false;
+                mBottomSensorActive = false;
+            }
             mWifiTable = findWifiTable();
             mWifiTableEasy = findWifiTableEasy();
             if (mWifiTable == mWifiTableEasy) {
@@ -179,6 +192,7 @@ public class SarTable {
     }
 
     public static int main(String[] args) {
+        checkModemTable();
         checkWifiTable();
         return 0;
     }
