@@ -24,19 +24,33 @@ public class AnimateFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ((ImageView) view.findViewById(R.id.halo)).setImageDrawable(getResources().getDrawable(R.drawable.halo));
+        ((ImageView) view.findViewById(R.id.home)).setImageDrawable(getResources().getDrawable(R.drawable.ic_sysbar_home));
+
+        ((ImageView) view.findViewById(R.id.halo_opa)).setImageDrawable(getResources().getDrawable(R.drawable.halo));
+        ((ImageView) view.findViewById(R.id.home_opa)).setImageDrawable(getResources().getDrawable(R.drawable.ic_sysbar_opa_home));
+
         Drawable drawable = getResources().getDrawable(R.drawable.ic_face_scanning);
         ((ImageView) view.findViewById(R.id.animate)).setImageDrawable(drawable);
 
         final AnimatedVectorDrawable animation = (AnimatedVectorDrawable) drawable;
-        if (animation != null) {
-            animation.clearAnimationCallbacks();
+        view.findViewById(R.id.animate_start).setOnClickListener(v -> {
+            animation.start();
             animation.registerAnimationCallback(new Animatable2.AnimationCallback() {
+                @Override
+                public void onAnimationStart(Drawable drawable) {
+
+                }
+
                 @Override
                 public void onAnimationEnd(Drawable drawable) {
                     animation.start();
                 }
             });
-            animation.start();
-        }
+        });
+        view.findViewById(R.id.animate_stop).setOnClickListener(v -> {
+            animation.stop();
+            animation.clearAnimationCallbacks();
+        });
     }
 }
