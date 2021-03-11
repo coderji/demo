@@ -17,8 +17,6 @@ public class DevicePolicyFragment extends Fragment {
 
         final DevicePolicyManager dpm =
                 (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        Log.d(TAG, "dpm:" + dpm);
-        long strongAuthTime = dpm.getRequiredStrongAuthTimeout(null);
-        Log.d(TAG, "getRequiredStrongAuthTimeout:" + strongAuthTime);
+        Log.d(TAG, "strongAuthTime:" + dpm.getRequiredStrongAuthTimeout(null));
     }
 }

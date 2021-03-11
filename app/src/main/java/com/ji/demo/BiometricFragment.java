@@ -3,6 +3,7 @@ package com.ji.demo;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
@@ -55,6 +56,9 @@ public class BiometricFragment extends Fragment {
                 Log.d(TAG, "onClick view:" + view);
             }
         });
+
+        PackageManager pm = view.getContext().getPackageManager();
+        Log.d(TAG, "hasSystemFeature face:" + pm.hasSystemFeature(PackageManager.FEATURE_FACE));
     }
 
     private void setBiometricOld(View view) {

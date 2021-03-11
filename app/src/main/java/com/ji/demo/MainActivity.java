@@ -17,7 +17,7 @@ public class MainActivity extends FragmentActivity {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.main_content, new DevicePolicyFragment())
+                .add(R.id.main_content, new ResourceFragment())
                 .commit();
     }
 
@@ -26,7 +26,7 @@ public class MainActivity extends FragmentActivity {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.main_content);
         if (fragment instanceof BackPressed && ((BackPressed) fragment).onBackPressed()) {
             Log.d(TAG, "onBackPressed fragment:" + fragment);
-        } else    {
+        } else {
             super.onBackPressed();
         }
     }

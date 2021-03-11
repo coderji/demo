@@ -53,7 +53,7 @@ public class NotificationFragment extends Fragment {
         builder.setSmallIcon(android.R.mipmap.sym_def_app_icon);
 
         NotificationChannel channel =
-                new NotificationChannel("NotificationChannelID", "NotificationChannel", NotificationManager.IMPORTANCE_DEFAULT);
+                new NotificationChannel("NotificationChannelID", "NotificationChannel", NotificationManager.IMPORTANCE_HIGH);
         mNotificationManager.createNotificationChannel(channel);
         builder.setChannelId(channel.getId());
 
