@@ -33,18 +33,8 @@ public class NotificationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mNotificationManager = (NotificationManager) view.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        view.findViewById(R.id.nt_send).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendNotify();
-            }
-        });
-        view.findViewById(R.id.nt_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancelNotify();
-            }
-        });
+        view.findViewById(R.id.nt_send).setOnClickListener(v -> sendNotify());
+        view.findViewById(R.id.nt_cancel).setOnClickListener(v -> cancelNotify());
     }
 
     private void sendNotify() {

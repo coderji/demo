@@ -32,18 +32,9 @@ public class FgServiceFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        view.findViewById(R.id.fg_start).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.getContext().startService(new Intent(getContext(), FgService.class));
-            }
-        });
-        view.findViewById(R.id.fg_stop).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.getContext().stopService(new Intent(getContext(), FgService.class));
-            }
-        });
+        Intent fgService = new Intent(getContext(), FgService.class);
+        view.findViewById(R.id.fg_start).setOnClickListener(v -> v.getContext().startService(fgService));
+        view.findViewById(R.id.fg_stop).setOnClickListener(v -> v.getContext().stopService(fgService));
     }
 
     public static class FgService extends Service {
@@ -70,7 +61,7 @@ public class FgServiceFragment extends Fragment {
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
             super.onStartCommand(intent, flags, startId);
-            Log.v(TAG, "onStartCommand flags:" + flags + " startId:" + startId);
+            Log.v(TAG, "onStartCommand " + intent.getStringExtra("key"));
 
             NotificationManager notificationManager = (NotificationManager)
                     getSystemService(Context.NOTIFICATION_SERVICE);

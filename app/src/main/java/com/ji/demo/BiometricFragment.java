@@ -1,7 +1,6 @@
 package com.ji.demo;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
@@ -50,12 +49,7 @@ public class BiometricFragment extends Fragment {
         setOverlayView(view.findViewById(R.id.biometric_overlay));
 
         view.setId(R.id.biometric);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "onClick view:" + view);
-            }
-        });
+        view.setOnClickListener(v -> Log.d(TAG, "onClick view:" + v));
 
         PackageManager pm = view.getContext().getPackageManager();
         Log.d(TAG, "hasSystemFeature face:" + pm.hasSystemFeature(PackageManager.FEATURE_FACE));
@@ -102,19 +96,11 @@ public class BiometricFragment extends Fragment {
             }
         };
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final CancellationSignal cancellationSignal = new CancellationSignal();
-                alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        cancellationSignal.cancel();
-                    }
-                });
-                alertDialog.show();
-                fingerprintManagerCompat.authenticate(null, 0, cancellationSignal, authenticationCallback, null);
-            }
+        view.setOnClickListener(view1 -> {
+            final CancellationSignal cancellationSignal = new CancellationSignal();
+            alertDialog.setOnDismissListener(dialogInterface -> cancellationSignal.cancel());
+            alertDialog.show();
+            fingerprintManagerCompat.authenticate(null, 0, cancellationSignal, authenticationCallback, null);
         });
     }
 
@@ -153,12 +139,7 @@ public class BiometricFragment extends Fragment {
                 .setNegativeButtonText("Cancel")
                 .build();
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                biometricPrompt.authenticate(promptInfo);
-            }
-        });
+        view.setOnClickListener(v -> biometricPrompt.authenticate(promptInfo));
     }
 
     private void setOverlayView(View view) {
