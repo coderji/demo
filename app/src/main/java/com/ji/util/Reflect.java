@@ -1,25 +1,11 @@
 package com.ji.util;
 
-import android.annotation.SuppressLint;
-import android.os.Debug;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class Reflect {
     private static final String TAG = "Reflect";
-
-    @SuppressLint("DiscouragedPrivateApi")
-    public static String getCallers(final int depth) {
-        try {
-            return (String) Debug.class.getDeclaredMethod("getCallers", int.class)
-                    .invoke(null, depth);
-        } catch (Exception e) {
-            Log.e(TAG, "getCallers", e);
-        }
-        return null;
-    }
 
     public static Method getMethod(Class cls, String methodName, Class<?>... parameterTypes) {
         try {

@@ -1,20 +1,10 @@
 package com.ji.demo;
 
 import android.app.AlertDialog;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.os.SystemProperties;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,10 +19,6 @@ import com.ji.util.Log;
 
 public class BiometricFragment extends Fragment {
     private static final String TAG = "BiometricFragment";
-    private WindowManager mWindowManager;
-    private SurfaceView mDarkView, mLightView;
-    private WindowManager.LayoutParams mDarkLayoutParams, mLightLayoutParams;
-    private String HBM_PATH = "/sys/class/backlight/panel0-backlight/hbm";
 
     @Nullable
     @Override
@@ -46,13 +32,6 @@ public class BiometricFragment extends Fragment {
 
         setBiometricOld(view.findViewById(R.id.biometric_old));
         setBiometricNew(view.findViewById(R.id.biometric_new));
-        setOverlayView(view.findViewById(R.id.biometric_overlay));
-
-        view.setId(R.id.biometric);
-        view.setOnClickListener(v -> Log.d(TAG, "onClick view:" + v));
-
-        PackageManager pm = view.getContext().getPackageManager();
-        Log.d(TAG, "hasSystemFeature face:" + pm.hasSystemFeature(PackageManager.FEATURE_FACE));
     }
 
     private void setBiometricOld(View view) {
@@ -96,7 +75,7 @@ public class BiometricFragment extends Fragment {
             }
         };
 
-        view.setOnClickListener(view1 -> {
+        view.setOnClickListener(v -> {
             final CancellationSignal cancellationSignal = new CancellationSignal();
             alertDialog.setOnDismissListener(dialogInterface -> cancellationSignal.cancel());
             alertDialog.show();
@@ -140,88 +119,5 @@ public class BiometricFragment extends Fragment {
                 .build();
 
         view.setOnClickListener(v -> biometricPrompt.authenticate(promptInfo));
-    }
-
-    private void setOverlayView(View view) {
-        mWindowManager = view.getContext().getSystemService(WindowManager.class);
-        mDarkLayoutParams = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_APPLICATION,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                PixelFormat.TRANSLUCENT);
-        mDarkLayoutParams.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-        mDarkLayoutParams.gravity = Gravity.BOTTOM;
-        mDarkLayoutParams.setTitle("DarkLayout");
-
-        mLightLayoutParams = new WindowManager.LayoutParams(
-                200,
-                200,
-                WindowManager.LayoutParams.TYPE_APPLICATION,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
-        mLightLayoutParams.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-        mLightLayoutParams.gravity = Gravity.BOTTOM;
-        mLightLayoutParams.y = 300;
-        mLightLayoutParams.setTitle("LightLayout");
-
-        mDarkView = new SurfaceView(view.getContext());
-        mDarkView.setId(R.id.dark);
-//        mDarkView.setBackgroundColor(Color.BLACK);
-        mDarkView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-        mDarkView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                Log.d(TAG, "surfaceCreated");
-                Canvas canvas = holder.lockCanvas();
-                canvas.drawColor(Color.argb(0.6f, 0, 0, 0));
-                holder.unlockCanvasAndPost(canvas);
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                Log.d(TAG, "surfaceChanged");
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-                Log.d(TAG, "surfaceDestroyed");
-            }
-        });
-        mDarkView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {
-                mDarkView.post(() -> SystemProperties.set("config.write.one", HBM_PATH));
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-                mDarkView.post(() -> SystemProperties.set("config.write.zero", HBM_PATH));
-            }
-        });
-
-        mLightView = new SurfaceView(view.getContext());
-        mLightView.setId(R.id.light);
-        mLightView.setBackgroundColor(Color.WHITE);
-
-        view.setOnClickListener(v -> {
-            Log.d(TAG, "onClick view:" + v);
-            mDarkView.setAlpha(0.6f);
-            try {
-                mWindowManager.addView(mDarkView, mDarkLayoutParams);
-                mWindowManager.addView(mLightView, mLightLayoutParams);
-            } catch (RuntimeException e) {
-                Log.e(TAG, "addView", e);
-            }
-
-            v.postDelayed(() -> {
-                try {
-                    mWindowManager.removeView(mLightView);
-                    mWindowManager.removeView(mDarkView);
-                } catch (RuntimeException e) {
-                    Log.e(TAG, "removeView", e);
-                }
-            }, 5000);
-        });
     }
 }
