@@ -15,6 +15,11 @@ import com.ji.util.Log;
 public class TelephonyFragment  extends Fragment {
     private static final String TAG = "TelephonyFragment";
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+    }
+
     private void listenCallState(Context context) {
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         telephonyManager.listen(new PhoneStateListener() {

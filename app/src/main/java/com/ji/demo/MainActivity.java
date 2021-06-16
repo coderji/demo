@@ -17,7 +17,7 @@ public class MainActivity extends FragmentActivity {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.main_content, new SensorFragment())
+                .add(R.id.main_content, new TelephonyFragment())
                 .commit();
     }
 
