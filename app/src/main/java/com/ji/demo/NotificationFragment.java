@@ -14,9 +14,10 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
-public class NotificationFragment extends Fragment {
+import com.ji.util.BaseFragment;
+
+public class NotificationFragment extends BaseFragment {
     private static final String TAG = "NotificationFragment";
     private NotificationManager mNotificationManager;
     private static final int ID = 0;

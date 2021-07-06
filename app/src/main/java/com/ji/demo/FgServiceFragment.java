@@ -14,11 +14,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
+import com.ji.util.BaseFragment;
 import com.ji.util.Log;
 
-public class FgServiceFragment extends Fragment {
+public class FgServiceFragment extends BaseFragment {
     private static final String TAG = "FgServiceFragment";
 
     @Nullable
@@ -59,9 +59,7 @@ public class FgServiceFragment extends Fragment {
 
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
-            super.onStartCommand(intent, flags, startId);
-            Log.v(TAG, "onStartCommand " + intent.getStringExtra("key"));
-
+            Log.v(TAG, "onStartCommand");
             NotificationManager notificationManager = (NotificationManager)
                     getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager != null) {
@@ -77,8 +75,7 @@ public class FgServiceFragment extends Fragment {
 
                 startForeground(ID, builder.build());
             }
-
-            return START_STICKY;
+            return super.onStartCommand(intent, flags, startId);
         }
     }
 }

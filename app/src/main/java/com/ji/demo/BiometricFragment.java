@@ -13,11 +13,11 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 import androidx.core.os.CancellationSignal;
-import androidx.fragment.app.Fragment;
 
+import com.ji.util.BaseFragment;
 import com.ji.util.Log;
 
-public class BiometricFragment extends Fragment {
+public class BiometricFragment extends BaseFragment {
     private static final String TAG = "BiometricFragment";
 
     @Nullable
@@ -40,7 +40,6 @@ public class BiometricFragment extends Fragment {
                 .setMessage("Log in using your biometric credential")
                 .setNegativeButton("Cancel", null)
                 .create();
-
         final FingerprintManagerCompat fingerprintManagerCompat = FingerprintManagerCompat.from(view.getContext());
         final FingerprintManagerCompat.AuthenticationCallback authenticationCallback = new FingerprintManagerCompat.AuthenticationCallback() {
             @Override
@@ -68,13 +67,11 @@ public class BiometricFragment extends Fragment {
             @Override
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();
-                super.onAuthenticationFailed();
                 Toast.makeText(getContext(), "OldAuthentication failed",
                         Toast.LENGTH_SHORT)
                         .show();
             }
         };
-
         view.setOnClickListener(v -> {
             final CancellationSignal cancellationSignal = new CancellationSignal();
             alertDialog.setOnDismissListener(dialogInterface -> cancellationSignal.cancel());
@@ -84,6 +81,11 @@ public class BiometricFragment extends Fragment {
     }
 
     private void setBiometricNew(View view) {
+        final BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("NewBiometric login for my app")
+                .setSubtitle("Log in using your biometric credential")
+                .setNegativeButtonText("Cancel")
+                .build();
         final BiometricPrompt biometricPrompt = new BiometricPrompt(this,
                 ContextCompat.getMainExecutor(view.getContext()), new BiometricPrompt.AuthenticationCallback() {
             @Override
@@ -111,13 +113,6 @@ public class BiometricFragment extends Fragment {
                         .show();
             }
         });
-
-        final BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("NewBiometric login for my app")
-                .setSubtitle("Log in using your biometric credential")
-                .setNegativeButtonText("Cancel")
-                .build();
-
         view.setOnClickListener(v -> biometricPrompt.authenticate(promptInfo));
     }
 }
