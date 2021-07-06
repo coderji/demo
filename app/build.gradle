@@ -23,6 +23,7 @@ android {
 }
 
 dependencies {
+    compileOnly files('libs/Android_R_HiddenApi.jar')
     implementation 'androidx.fragment:fragment:1.2.4'
     implementation 'androidx.biometric:biometric:1.0.1'
 }
