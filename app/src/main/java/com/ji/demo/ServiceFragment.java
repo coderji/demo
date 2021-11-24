@@ -18,13 +18,13 @@ import androidx.annotation.Nullable;
 import com.ji.util.BaseFragment;
 import com.ji.util.Log;
 
-public class FgServiceFragment extends BaseFragment {
-    private static final String TAG = "FgServiceFragment";
+public class ServiceFragment extends BaseFragment {
+    private static final String TAG = "ServiceFragment";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_fg_service, container, false);
+        return inflater.inflate(R.layout.fragment_service, container, false);
     }
 
     @Override
