@@ -11,8 +11,6 @@ import androidx.annotation.Nullable;
 import com.ji.util.BaseFragment;
 import com.ji.util.Log;
 
-import org.apache.http.ProtocolVersion;
-
 import java.util.Arrays;
 
 public class CaseFragment extends BaseFragment {
@@ -29,22 +27,15 @@ public class CaseFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         testResources();
-        testHttp();
+        // testHttp();
     }
 
     private void testResources() {
-        int id = getResources().getIdentifier("config_biometric_sensors", "array", "android");
+        int id = getResources().getIdentifier("fingerprint_acquired_vendor", "array", "android");
         Log.d(TAG, "testResources id:" + id);
         if (id > 0) {
-            String[] config_biometric_sensors = getResources().getStringArray(id);
-            Log.d(TAG, "testResources config_biometric_sensors:" + Arrays.toString(config_biometric_sensors));
+            String[] fingerprint_acquired_vendor = getResources().getStringArray(id);
+            Log.d(TAG, "testResources fingerprint_acquired_vendor:" + Arrays.toString(fingerprint_acquired_vendor));
         }
-    }
-
-    private void testHttp() {
-        Log.d(TAG, "testHttp getClass.classLoader:" + getClass().getClassLoader());
-        ProtocolVersion v = new ProtocolVersion("1", 1, 1);
-        ClassLoader classLoader = v.getClass().getClassLoader();
-        Log.d(TAG, "testHttp ProtocolVersion.classLoader:" + classLoader);
     }
 }

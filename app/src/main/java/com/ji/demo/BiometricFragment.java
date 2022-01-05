@@ -1,6 +1,7 @@
 package com.ji.demo;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,11 +73,19 @@ public class BiometricFragment extends BaseFragment {
                         .show();
             }
         };
-        view.setOnClickListener(v -> {
-            final CancellationSignal cancellationSignal = new CancellationSignal();
-            alertDialog.setOnDismissListener(dialogInterface -> cancellationSignal.cancel());
-            alertDialog.show();
-            fingerprintManagerCompat.authenticate(null, 0, cancellationSignal, authenticationCallback, null);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final CancellationSignal cancellationSignal = new CancellationSignal();
+                alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        cancellationSignal.cancel();
+                    }
+                });
+                alertDialog.show();
+                fingerprintManagerCompat.authenticate(null, 0, cancellationSignal, authenticationCallback, null);
+            }
         });
     }
 
@@ -113,6 +122,11 @@ public class BiometricFragment extends BaseFragment {
                         .show();
             }
         });
-        view.setOnClickListener(v -> biometricPrompt.authenticate(promptInfo));
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                biometricPrompt.authenticate(promptInfo);
+            }
+        });
     }
 }
