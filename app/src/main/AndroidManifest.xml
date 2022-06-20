@@ -17,7 +17,7 @@
 
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
 
-        <activity android:name="com.ji.demo.MainActivity">
+        <activity android:name="com.ji.demo.MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.intent.action.VIEW"/>
@@ -28,7 +28,7 @@
 
         <service android:name="com.ji.demo.ServiceFragment$FgService"/>
 
-        <receiver android:name="com.ji.demo.Receiver">
+        <receiver android:name="com.ji.demo.Receiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.ACTION_SHUTDOWN" />

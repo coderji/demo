@@ -58,7 +58,7 @@ public class NotificationFragment extends BaseFragment {
         builder.setChannelId(channel.getId());
 
         PendingIntent intent = PendingIntent.getActivity(getContext(),
-                0, new Intent(Intent.ACTION_DIAL), 0);
+                0, new Intent(Intent.ACTION_DIAL), PendingIntent.FLAG_IMMUTABLE);
         Notification.Action.Builder actionBuilder = new Notification.Action.Builder(
                 Icon.createWithResource(getContext(), android.R.mipmap.sym_def_app_icon),
                 "Dial",
