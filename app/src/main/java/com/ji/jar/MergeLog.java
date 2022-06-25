@@ -1,75 +1,50 @@
-package com.ji.terminal;
+package com.ji.jar;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 
 public class MergeLog {
     private static final String TAG = "MergeLog";
-    private static boolean V = false;
+    private static boolean DEBUG = false;
 
-    private static void mergeFile(String path) {
-        log("mergeFile path:" + path);
-        if (!path.endsWith(File.separator)) {
-            path = path + File.separator;
-        }
-        File directory = new File(path);
-        if (directory.exists() && directory.isDirectory()) {
-            HashMap<String, String> map = new HashMap<>();
-            for (String name : Objects.requireNonNull(directory.list())) {
-                if (name.endsWith("-e.txt")) {
-                    String key = name.substring(0, name.indexOf("-e.txt"));
-                    map.put(key, map.getOrDefault(key, "") + "-e");
-                } else if (name.endsWith("-m.txt")) {
-                    String key = name.substring(0, name.indexOf("-m.txt"));
-                    map.put(key, map.getOrDefault(key, "") + "-m");
-                } else if (name.endsWith("-r.txt")) {
-                    String key = name.substring(0, name.indexOf("-r.txt"));
-                    map.put(key, map.getOrDefault(key, "") + "-r");
-                } else if (name.endsWith("-s.txt")) {
-                    String key = name.substring(0, name.indexOf("-s.txt"));
-                    map.put(key, map.getOrDefault(key, "") + "-s");
-                }
-            }
-            for (String key : map.keySet()) {
-                mergeFile(path, key, Objects.requireNonNull(map.getOrDefault(key, "")));
-            }
-        } else {
-            log("mergeFile get directory fail");
-        }
-    }
-
-    private static void mergeFile(String path, String name, String attr) {
-        String[] attrs = attr.substring(1).split("-");
-        log("mergeFile name:" + name + " attrs:" + Arrays.toString(attrs));
-        FileReader[] frs = new FileReader[attrs.length];
-        BufferedReader[] brs = new BufferedReader[attrs.length];
-        String[] strings = new String[attrs.length];
-        int[] attrLines = new int[attrs.length];
+    private static void mergeFile(String[] paths) {
+        log("mergeFile paths:" + Arrays.toString(paths));
+        int length = paths.length;
+        FileReader[] frs = new FileReader[length];
+        BufferedReader[] brs = new BufferedReader[length];
+        String[] strings = new String[length];
+        int[] lines = new int[length];
         int mergeLine = 0;
         try {
             int minIndex = 0;
-            for (int i = 0; i < attrs.length; i++) {
-                frs[i] = new FileReader(path + name + "-" + attrs[i] + ".txt");
+            for (int i = 0; i < length; i++) {
+                frs[i] = new FileReader(paths[i]);
                 brs[i] = new BufferedReader(frs[i]);
                 if (brs[i].ready()) {
                     strings[i] = brs[i].readLine();
-                    attrLines[i] = 1;
+                    lines[i] = 1;
                     if (i != minIndex && compare(strings[i], strings[minIndex]) < 0) {
                         minIndex = i;
                     }
                 } else {
-                    log("mergeFile " + attrs[i] + " not ready");
+                    log("mergeFile " + paths[i] + " not ready");
                     brs[i].close();
                     frs[i].close();
-                    attrLines[i] = 0;
+                    lines[i] = 0;
                 }
             }
-            FileWriter fw = new FileWriter(path + name + "-all.txt");
+            FileWriter fw = new FileWriter("mergeLog.txt");
             BufferedWriter bw = new BufferedWriter(fw);
 
             while (true) {
-                if (V) log("mergeFile write " + attrs[minIndex] + " " + attrLines[minIndex]);
+                if (DEBUG) log("mergeFile write minIndex:" + minIndex + " line:" + lines[minIndex] + " string:" + strings[minIndex]);
                 bw.write(strings[minIndex]);
                 bw.newLine();
                 mergeLine++;
@@ -129,19 +104,17 @@ public class MergeLog {
     }
 
     private static void log(String s) {
-        System.out.println(new SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(new Date())
-                + " " + TAG + ": " + s);
+        System.out.println(new SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(new Date()) + " " + TAG + ": " + s);
     }
 
-    public static int main(String[] args) {
-        if (args == null || args.length != 1) {
-            System.out.println("Usage: java -jar app.jar [directory]");
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            System.out.println("Usage: java -jar mergeLog.jar file1 file2 ...");
         } else {
             long begin = System.currentTimeMillis();
-            mergeFile(args[0]);
+            mergeFile(args);
             long end = System.currentTimeMillis();
             log("mergeFile time:" + (end - begin) / 1000);
         }
-        return 0;
     }
 }

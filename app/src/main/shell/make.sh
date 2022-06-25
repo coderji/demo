@@ -14,6 +14,7 @@ FAKE_NAME=$3
 # incremental
 if [[ $TARGET_SHORT != "" ]]; then
   PACKAGE=$SOURCE_SHORT-$TARGET_SHORT$FAKE_NAME
+  echo "$PACKAGE"
   if [ -d $PACKAGE ]; then
     echo "$PACKAGE already exist, stop"
     exit 1
