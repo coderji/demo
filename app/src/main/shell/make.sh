@@ -5,7 +5,6 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 SOURCE_FULL=$1
 SOURCE_SHORT=`echo $SOURCE_FULL | awk -F '_WIKO_' '{print $2}' | awk -F '_target_' '{print $1}'`
-SOURCE_HEAD=`echo $SOURCE_FULL | awk -F '_target_' '{print $1}'`
 TARGET_FULL=$2
 TARGET_SHORT=`echo $TARGET_FULL | awk -F '_WIKO_' '{print $2}' | awk -F '_target_' '{print $1}'`
 #./make.sh v1.zip v2.zip -999
@@ -27,17 +26,16 @@ if [[ $TARGET_SHORT != "" ]]; then
   echo "TARGET_FULL=$TARGET_FULL" >> $PACKAGE/info.txt
   echo "TARGET_SHORT=$TARGET_SHORT" >> $PACKAGE/info.txt
 
-  if [[ `echo $SOURCE_FULL | grep -E "V770AN_|V673_"` != "" ]]; then
-    echo "V770AN/V673 incremental" >> $PACKAGE/info.txt
-    ./out/host/linux-x86/bin/ota_from_target_files -k vendor/tinno/product/common_req/tinno/security/releasekey -i $SOURCE_FULL $TARGET_FULL $PACKAGE/$PACKAGE.zip
-  elif [[ `echo $SOURCE_FULL | grep -E "P861AE_"` != "" ]]; then
-    echo "P861AE incremental" >> $PACKAGE/info.txt
+  if [[ `echo $SOURCE_FULL | grep -E "V770AN_|V673_|P861AE_"` != "" ]]; then
+    echo "V770AN/P861AE/V673 incremental" >> $PACKAGE/info.txt
     ./out/host/linux-x86/bin/ota_from_target_files -k vendor/tinno/product/common_req/tinno/security/releasekey -i $SOURCE_FULL $TARGET_FULL $PACKAGE/$PACKAGE.zip
     #./out/host/linux-x86/bin/ota_from_target_files -k vendor/tinno/product/common_req/tinno/security/releasekey --carrier EEA -i $SOURCE_FULL $TARGET_FULL $PACKAGE/EEA-$PACKAGE.zip
     #./out/host/linux-x86/bin/ota_from_target_files -k vendor/tinno/product/common_req/tinno/security/releasekey --carrier RU  -i $SOURCE_FULL $TARGET_FULL $PACKAGE/RU-$PACKAGE.zip
   elif [[ `echo $SOURCE_FULL | grep -E "V820AE_|Romanee_"` != "" ]]; then
     echo "V820AE/Romanee incremental" >> $PACKAGE/info.txt
     ./out_sys/host/linux-x86/bin/ota_from_target_files -k vendor/wiko/product/common_req/wiko/security/releasekey -i $SOURCE_FULL $TARGET_FULL $PACKAGE/$PACKAGE.zip
+    ./out_sys/host/linux-x86/bin/ota_from_target_files -k vendor/wiko/product/common_req/wiko/security/releasekey --carrier EEA -i $SOURCE_FULL $TARGET_FULL $PACKAGE/EEA-$PACKAGE.zip
+    ./out_sys/host/linux-x86/bin/ota_from_target_files -k vendor/wiko/product/common_req/wiko/security/releasekey --carrier RU  -i $SOURCE_FULL $TARGET_FULL $PACKAGE/RU-$PACKAGE.zip
   fi
 
   echo `date "+%Y%m%d-%H%M%S"` >> $PACKAGE/info.txt

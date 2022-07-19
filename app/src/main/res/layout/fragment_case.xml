@@ -4,4 +4,19 @@
     android:layout_height="match_parent"
     android:gravity="bottom|center_horizontal">
 
+    <Button
+        android:id="@+id/case_resources"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="resources" />
+
+    <Space
+        android:layout_width="80dp"
+        android:layout_height="0dp" />
+
+    <Button
+        android:id="@+id/case_fill"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="fill" />
 </LinearLayout>

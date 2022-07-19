@@ -32,13 +32,13 @@ public class ServiceFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         final Intent fgService = new Intent(getContext(), FgService.class);
-        view.findViewById(R.id.fg_start).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.service_start).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 view.getContext().startService(fgService);
             }
         });
-        view.findViewById(R.id.fg_stop).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.service_stop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 view.getContext().stopService(fgService);

@@ -5,7 +5,7 @@
     android:gravity="bottom|center_horizontal">
 
     <Button
-        android:id="@+id/fg_start"
+        android:id="@+id/service_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="start" />
@@ -15,7 +15,7 @@
         android:layout_height="0dp" />
 
     <Button
-        android:id="@+id/fg_stop"
+        android:id="@+id/service_stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="stop" />
