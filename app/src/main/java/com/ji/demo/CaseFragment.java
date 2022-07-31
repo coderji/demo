@@ -59,7 +59,7 @@ public class CaseFragment extends BaseFragment {
         long usableSpace = data.getUsableSpace();
         Log.d(TAG, "fillData usableSpace:" + usableSpace);
         try {
-            int BUFF_SIZE = 8 * 1 * 1024;
+            int BUFF_SIZE = 8 * 1024;
             byte[] bytes = new byte[BUFF_SIZE];
             new Random().nextBytes(bytes);
             RandomAccessFile randomAccessFile = new RandomAccessFile(data, "rws");

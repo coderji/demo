@@ -4,22 +4,29 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.ji.remotedemo.IRemoteCallback;
+import com.ji.remotedemo.IRemoteDemo;
 import com.ji.util.BaseFragment;
 import com.ji.util.Log;
 
 public class ServiceFragment extends BaseFragment {
     private static final String TAG = "ServiceFragment";
+    private static TextView mDataView;
 
     @Nullable
     @Override
@@ -35,16 +42,58 @@ public class ServiceFragment extends BaseFragment {
         view.findViewById(R.id.service_start).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                view.getContext().startService(fgService);
+                Log.v(TAG, "startService");
+                // view.getContext().startService(fgService);
+                Intent intent = new Intent();
+                intent.setClassName("com.ji.remotedemo", "com.ji.remotedemo.ServiceFragment$$FgService");
+                view.getContext().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             }
         });
         view.findViewById(R.id.service_stop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                view.getContext().stopService(fgService);
+                Log.v(TAG, "stopService");
+                // view.getContext().stopService(fgService);
+                view.getContext().unbindService(mConnection);
             }
         });
+        mDataView = view.findViewById(R.id.service_data);
     }
+
+    private IRemoteDemo mRemoteDemo = null;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.v(TAG, "onServiceConnected");
+            mRemoteDemo = IRemoteDemo.Stub.asInterface(service);
+            try {
+                mRemoteDemo.register(new IRemoteCallback.Stub() {
+                    @Override
+                    public void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat, double aDouble, String aString) throws RemoteException {
+
+                    }
+
+                    @Override
+                    public void dataCallback(String data) throws RemoteException {
+                        Log.d(TAG, "dataCallback data:" + data);
+                        mDataView.setText(data);
+                    }
+
+                    @Override
+                    public IBinder asBinder() {
+                        return null;
+                    }
+                });
+            } catch (RemoteException e) {
+                Log.e(TAG, "mRemoteDemo register", e);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.v(TAG, "onServiceDisconnected");
+        }
+    };
 
     public static class FgService extends Service {
         private static final String TAG = "FgService";

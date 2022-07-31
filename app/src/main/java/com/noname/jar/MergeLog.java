@@ -12,12 +12,22 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
+/*
+ * v1.0
+ *   java -jar [debuglogger path]
+ *             (see all_log in your debuglogger path)
+ *   java -jar [file1 file2 file3 ...]
+ *             (see all_log in your current path)
+ *
+ * v1.1
+ *   all log file mark time
+  */
 public class MergeLog {
     private static final String TAG = "MergeLog";
     private static boolean DEBUG = false;
 
     private static void mergeFile(String[] files, String outDir) {
-        log("mergeFile files:" + Arrays.toString(files));
+        if (DEBUG) log("mergeFile files:" + Arrays.toString(files));
         int length = files.length;
         FileReader[] frs = new FileReader[length];
         BufferedReader[] brs = new BufferedReader[length];
@@ -38,7 +48,7 @@ public class MergeLog {
         try {
             int allLogIndex = 0;
             int line = 0;
-            FileWriter fw = new FileWriter(outDir + File.separator + "all_log_" + allLogIndex + ".txt");
+            FileWriter fw = new FileWriter(outDir + File.separator + "all_log_" + allLogIndex + "_" + getTime(strings[0]) + ".txt");
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(timezone);
             while (true) {
@@ -58,7 +68,7 @@ public class MergeLog {
                     fw.close();
 
                     allLogIndex++;
-                    fw = new FileWriter(outDir + File.separator + "all_log_" + allLogIndex + ".txt");
+                    fw = new FileWriter(outDir + File.separator + "all_log_" + allLogIndex + "_" + getTime(strings[min]) + ".txt");
                     bw = new BufferedWriter(fw);
                     bw.write(timezone);
                 }
@@ -99,7 +109,27 @@ public class MergeLog {
         return min;
     }
 
+    private static String getTime(String s) {
+        // 07-04 13:02:29.039012
+        if (DEBUG) log("getTime s:" + s);
+        StringBuilder time = new StringBuilder();
+        time.append(s.charAt(0));
+        time.append(s.charAt(1));
+        time.append(s.charAt(3));
+        time.append(s.charAt(4));
+        time.append('-');
+        time.append(s.charAt(6));
+        time.append(s.charAt(7));
+        time.append(s.charAt(9));
+        time.append(s.charAt(10));
+        time.append(s.charAt(12));
+        time.append(s.charAt(13));
+        if (DEBUG) log("getTime time:" + time.toString());
+        return time.toString();
+    }
+
     private static int compare(String a, String b) {
+        // 07-04 13:02:29.039012
         for (int i = 0; i < 21 /* format date */ && i < a.length() && i < b.length(); i++) {
             if (a.charAt(i) > b.charAt(i)) {
                 return 1;
@@ -120,26 +150,42 @@ public class MergeLog {
     }
 
     private static void mergeDir(String dir) {
-        log("mergeDir dir:" + dir);
+        if (dir.endsWith("debuglogger")) {
+            mergeMobileLog(dir + File.separator + "mobilelog");
+        } else if (dir.endsWith("mobilelog")) {
+            mergeMobileLog(dir);
+        } else if (dir.contains("APLog")) {
+            mergeApLog(dir);
+        } else {
+            log("mergeDir dir unknown");
+        }
+    }
+
+    private static void mergeMobileLog(String dir) {
+        log("mergeMobileLog dir:" + dir);
         File[] apLogs = new File(dir).listFiles();
         if (apLogs != null) {
             for (File apLog : apLogs) {
                 if (apLog.isDirectory() && apLog.getName().startsWith("APLog")) {
-                    log("mergeDir ap:" + apLog);
-                    File[] logs = apLog.listFiles();
-                    if (logs != null) {
-                        ArrayList<String> mergeLogList = new ArrayList<>();
-                        for (File log : logs) {
-                            if (DEBUG) log("mergeDir log:" + log);
-                            if (needMerge(log.getName())) {
-                                mergeLogList.add(log.toString());
-                            }
-                        }
-                        String[] mergeLogs = mergeLogList.toArray(new String[0]);
-                        mergeFile(mergeLogs, apLog.toString());
-                    }
+                    mergeApLog(apLog.toString());
                 }
             }
+        }
+    }
+
+    private static void mergeApLog(String dir) {
+        log("mergeApLog dir:" + dir);
+        File[] logs = new File(dir).listFiles();
+        if (logs != null) {
+            ArrayList<String> mergeLogList = new ArrayList<>();
+            for (File log : logs) {
+                if (DEBUG) log("mergeApLog log:" + log);
+                if (needMerge(log.getName())) {
+                    mergeLogList.add(log.toString());
+                }
+            }
+            String[] mergeLogs = mergeLogList.toArray(new String[0]);
+            mergeFile(mergeLogs, dir);
         }
     }
 
@@ -155,36 +201,19 @@ public class MergeLog {
 
     public static void main(String[] args) {
         long begin = System.currentTimeMillis();
-        log("merge.jar version 1.0.20220701");
+        log("merge.jar version 1.1.20220728");
         log("merge events_log, kernel_log, main_log, sys_log to all_log");
         log("Usage: java -jar [debuglogger path]");
-        log("                 (debuglogger absolute path)");
-        log("       java -jar");
-        log("                 (move merge.jar to debuglogger, cd debuglogger, java -jar)");
+        log("                 (see all_log in your debuglogger path)");
+        log("       java -jar [file1 file2 file3 ...]");
+        log("                 (see all_log in your current dir)");
         log("");
         log("main args:" + Arrays.toString(args));
         String userDir = System.getProperty("user.dir");
         if (args.length == 0) {
-            if (userDir == null) {
-                log("main get user.dir fail");
-            } else if (userDir.endsWith("debuglogger")) {
-                mergeDir(userDir + File.separator + "mobilelog");
-            } else if (userDir.endsWith("mobilelog")) {
-                mergeDir(userDir);
-            } else {
-                log("main userDir:" + userDir + ", see Usage");
-            }
+            mergeDir(userDir);
         } else if (args.length == 1) {
-            userDir = args[0];
-            if (userDir == null) {
-                log("main get user.dir fail");
-            } else if (userDir.endsWith("debuglogger")) {
-                mergeDir(userDir + File.separator + "mobilelog");
-            } else if (userDir.endsWith("mobilelog")) {
-                mergeDir(userDir);
-            } else {
-                log("main userDir:" + userDir + ", see Usage");
-            }
+            mergeDir(args[0]);
         } else {
             mergeFile(args, userDir);
         }
