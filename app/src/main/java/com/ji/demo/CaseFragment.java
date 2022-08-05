@@ -11,15 +11,19 @@ import androidx.annotation.Nullable;
 import com.ji.util.BaseFragment;
 import com.ji.util.Log;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.Random;
 
 public class CaseFragment extends BaseFragment {
     private static final String TAG = "CaseFragment";
+
+    static {
+        System.loadLibrary("demo");
+    }
+
+    public static native String getUnlockCode(String sn);
 
     @Nullable
     @Override
@@ -30,19 +34,8 @@ public class CaseFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        view.findViewById(R.id.case_resources).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                invokeResources();
-            }
-        });
-        view.findViewById(R.id.case_fill).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fillData();
-            }
-        });
+        String sn = "78945264";
+        Log.d(TAG, "getUnlockCode sn:" + sn + " code:" + getUnlockCode(sn));
     }
 
     private void invokeResources() {

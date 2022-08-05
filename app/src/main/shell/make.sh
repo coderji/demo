@@ -5,12 +5,12 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 echo "Usage:"
 echo "  incremental OTA"
-echo "    bash make.sh v1-target.zip v2-target.zip"
-echo "    bash make.sh v1-target.zip v2-target.zip -end 999"
-echo "    bash make.sh v1-target.zip v2-target.zip -carrier eea"
+echo "    ./make.sh v1-target.zip v2-target.zip"
+echo "    ./make.sh v1-target.zip v2-target.zip -end 999"
+echo "    ./make.sh v1-target.zip v2-target.zip -carrier eea"
 echo ""
 echo "  full OTA"
-echo "    bash make.sh v1-target.zip"
+echo "    ./make.sh v1-target.zip"
 echo ""
 
 if [ $# -eq 0 ];then
