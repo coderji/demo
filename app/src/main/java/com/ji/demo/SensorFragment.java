@@ -14,8 +14,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ji.util.BaseFragment;
-import com.ji.util.Log;
+import com.ji.utils.BaseFragment;
+import com.ji.utils.LogUtils;
 
 public class SensorFragment extends BaseFragment {
     private static final String TAG = "SensorFragment";
@@ -42,10 +42,10 @@ public class SensorFragment extends BaseFragment {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (event.values.length == 0) {
-                Log.w(TAG, "event has no values");
+                LogUtils.w(TAG, "event has no values");
             } else {
                 boolean isNear = event.values[0] == 0;
-                Log.d(TAG, "isNear:" + isNear);
+                LogUtils.d(TAG, "isNear:" + isNear);
             }
         }
 

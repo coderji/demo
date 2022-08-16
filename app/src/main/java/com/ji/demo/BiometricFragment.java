@@ -15,8 +15,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 import androidx.core.os.CancellationSignal;
 
-import com.ji.util.BaseFragment;
-import com.ji.util.Log;
+import com.ji.utils.BaseFragment;
+import com.ji.utils.LogUtils;
 
 public class BiometricFragment extends BaseFragment {
     private static final String TAG = "BiometricFragment";
@@ -54,7 +54,7 @@ public class BiometricFragment extends BaseFragment {
             @Override
             public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
                 super.onAuthenticationHelp(helpMsgId, helpString);
-                Log.d(TAG, "OldAuthentication help: " + helpString);
+                LogUtils.d(TAG, "OldAuthentication help: " + helpString);
             }
 
             @Override

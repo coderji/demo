@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ji.util.BaseFragment;
-import com.ji.util.Log;
+import com.ji.utils.BaseFragment;
+import com.ji.utils.LogUtils;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -38,24 +38,24 @@ public class CaseFragment extends BaseFragment {
 
     private void invokeResources() {
         int id = getResources().getIdentifier("fingerprint_acquired_vendor", "array", "android");
-        Log.d(TAG, "invokeResources id:" + id);
+        LogUtils.d(TAG, "invokeResources id:" + id);
         if (id > 0) {
             String[] fingerprint_acquired_vendor = getResources().getStringArray(id);
-            Log.d(TAG, "invokeResources fingerprint_acquired_vendor:" + Arrays.toString(fingerprint_acquired_vendor));
+            LogUtils.d(TAG, "invokeResources fingerprint_acquired_vendor:" + Arrays.toString(fingerprint_acquired_vendor));
         }
     }
 
     private void fillData() {
         File data = new File(getContext().getFilesDir(), "fill-data");
         long usableSpace = data.getUsableSpace();
-        Log.d(TAG, "fillData usableSpace:" + usableSpace);
+        LogUtils.d(TAG, "fillData usableSpace:" + usableSpace);
         try {
             int BUFF_SIZE = 8 * 1024;
             byte[] bytes = new byte[BUFF_SIZE];
             new Random().nextBytes(bytes);
             RandomAccessFile randomAccessFile = new RandomAccessFile(data, "rws");
             randomAccessFile.seek(randomAccessFile.length());
-            Log.d(TAG, "fillData max:" + (int) (usableSpace / BUFF_SIZE));
+            LogUtils.d(TAG, "fillData max:" + (int) (usableSpace / BUFF_SIZE));
 
             while (usableSpace >= BUFF_SIZE) {
                 randomAccessFile.write(bytes);
@@ -63,8 +63,8 @@ public class CaseFragment extends BaseFragment {
             }
             randomAccessFile.close();
         } catch (Exception e) {
-            Log.e(TAG, "fillData", e);
+            LogUtils.e(TAG, "fillData", e);
         }
-        Log.d(TAG, "fillData done");
+        LogUtils.d(TAG, "fillData done");
     }
 }

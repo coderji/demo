@@ -24,8 +24,9 @@ import androidx.annotation.Nullable;
 
 import com.ji.remotedemo.IRemoteCallback;
 import com.ji.remotedemo.IRemoteDemo;
-import com.ji.util.BaseFragment;
-import com.ji.util.Log;
+import com.ji.utils.BaseFragment;
+import com.ji.utils.LogUtils;
+import com.ji.utils.ThreadUtils;
 
 public class ServiceFragment extends BaseFragment {
     private static final String TAG = "ServiceFragment";
@@ -45,7 +46,7 @@ public class ServiceFragment extends BaseFragment {
         view.findViewById(R.id.service_start).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v(TAG, "bindService");
+                LogUtils.v(TAG, "bindService");
                 Intent fgService = new Intent().setPackage("com.ji.remotedemo").setAction("com.ji.remotedemo.FgService");
                 view.getContext().bindService(fgService, mConnection, Context.BIND_AUTO_CREATE);
             }
@@ -53,12 +54,12 @@ public class ServiceFragment extends BaseFragment {
         view.findViewById(R.id.service_stop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v(TAG, "unbindService");
+                LogUtils.v(TAG, "unbindService");
                 if (mRemoteDemo != null) {
                     try {
                         mRemoteDemo.unregister(mRemoteCallback);
                     } catch (RemoteException e) {
-                        Log.e(TAG, "unregister", e);
+                        LogUtils.e(TAG, "unregister", e);
                     }
                     view.getContext().unbindService(mConnection);
                 }
@@ -71,18 +72,18 @@ public class ServiceFragment extends BaseFragment {
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.v(TAG, "onServiceConnected");
+            LogUtils.v(TAG, "onServiceConnected");
             mRemoteDemo = IRemoteDemo.Stub.asInterface(service);
             try {
                 mRemoteDemo.register(mRemoteCallback);
             } catch (RemoteException e) {
-                Log.e(TAG, "register", e);
+                LogUtils.e(TAG, "register", e);
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.v(TAG, "onServiceDisconnected");
+            LogUtils.v(TAG, "onServiceDisconnected");
             mRemoteDemo = null;
         }
     };
@@ -90,7 +91,7 @@ public class ServiceFragment extends BaseFragment {
     private final IRemoteCallback.Stub mRemoteCallback = new IRemoteCallback.Stub() {
         @Override
         public void dataCallback(final String data) throws RemoteException {
-            Log.v(TAG, "dataCallback data:" + data);
+            LogUtils.v(TAG, "dataCallback data:" + data);
             new Handler(Looper.getMainLooper()).post(() -> mDataView.setText(data));
         }
     };
@@ -106,7 +107,7 @@ public class ServiceFragment extends BaseFragment {
         private final IRemoteDemo.Stub mBinder = new IRemoteDemo.Stub() {
             @Override
             public int register(IRemoteCallback callback) throws RemoteException {
-                Log.v(TAG, "register");
+                LogUtils.v(TAG, "register");
                 if (callback != null) {
                     mCallbacks.register(callback);
                     return 0;
@@ -116,7 +117,7 @@ public class ServiceFragment extends BaseFragment {
 
             @Override
             public int unregister(IRemoteCallback callback) throws RemoteException {
-                Log.v(TAG, "unregister");
+                LogUtils.v(TAG, "unregister");
                 if (callback != null) {
                     mCallbacks.unregister(callback);
                     return 0;
@@ -147,7 +148,7 @@ public class ServiceFragment extends BaseFragment {
         @Override
         public void onCreate() {
             super.onCreate();
-            Log.v(TAG, "onCreate");
+            LogUtils.v(TAG, "onCreate");
             mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (mNotificationManager != null) {
                 Notification.Builder builder = new Notification.Builder(this, TAG);
@@ -162,33 +163,37 @@ public class ServiceFragment extends BaseFragment {
             }
 
             mRun = true;
-            new Thread(() -> {
-                while (mRun) {
-                    mData = String.valueOf(System.currentTimeMillis());
-                    Log.v(TAG, "run mData:" + mData);
-                    final int N = mCallbacks.beginBroadcast();
-                    for (int i = 0; i < N; i++) {
+            ThreadUtils.workExecute(new Runnable() {
+                @Override
+                public void run() {
+
+                    while (mRun) {
+                        mData = String.valueOf(System.currentTimeMillis());
+                        LogUtils.v(TAG, "run mData:" + mData);
+                        final int N = mCallbacks.beginBroadcast();
+                        for (int i = 0; i < N; i++) {
+                            try {
+                                mCallbacks.getBroadcastItem(i).dataCallback(mData);
+                            } catch (RemoteException e) {
+                                LogUtils.e(TAG, "run dataCallback", e);
+                            }
+                        }
+                        mCallbacks.finishBroadcast();
+
                         try {
-                            mCallbacks.getBroadcastItem(i).dataCallback(mData);
-                        } catch (RemoteException e) {
-                            Log.e(TAG, "run dataCallback", e);
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            LogUtils.e(TAG, "run sleep", e);
                         }
                     }
-                    mCallbacks.finishBroadcast();
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        Log.e(TAG, "run sleep", e);
-                    }
                 }
-            }).start();
+            });
         }
 
         @Override
         public void onDestroy() {
             super.onDestroy();
-            Log.v(TAG, "onDestroy");
+            LogUtils.v(TAG, "onDestroy");
             mCallbacks.kill();
             mRun = false;
             if (mNotificationManager != null) {
@@ -198,7 +203,7 @@ public class ServiceFragment extends BaseFragment {
 
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
-            Log.v(TAG, "onStartCommand startId:" + startId);
+            LogUtils.v(TAG, "onStartCommand startId:" + startId);
             return START_NOT_STICKY;
         }
     }

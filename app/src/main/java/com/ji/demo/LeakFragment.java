@@ -13,8 +13,8 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ji.util.BaseFragment;
-import com.ji.util.Log;
+import com.ji.utils.BaseFragment;
+import com.ji.utils.LogUtils;
 
 import java.io.InputStream;
 
@@ -29,7 +29,7 @@ public class LeakFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "0x" + Integer.toHexString(hashCode()) + " onCreateView");
+        LogUtils.d(TAG, "0x" + Integer.toHexString(hashCode()) + " onCreateView");
         return inflater.inflate(R.layout.fragment_leak, container, false);
     }
 
@@ -49,13 +49,13 @@ public class LeakFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d(TAG, "0x" + Integer.toHexString(hashCode()) + " onDestroyView");
+        LogUtils.d(TAG, "0x" + Integer.toHexString(hashCode()) + " onDestroyView");
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        Log.d(TAG, "0x" + Integer.toHexString(hashCode()) + " onLowMemory");
+        LogUtils.d(TAG, "0x" + Integer.toHexString(hashCode()) + " onLowMemory");
     }
 
     class LeaksHandler extends Handler {
@@ -67,7 +67,7 @@ public class LeakFragment extends BaseFragment {
                         .replace(R.id.main_content, new LeakFragment())
                         .commit();
             } else if (msg.what == MSG_LOG) {
-                Log.d(TAG, "0x" + Integer.toHexString(hashCode()) + " MSG_LOG mBitmap:" + mBitmap + " mByte:0x" + Integer.toHexString(mByte.hashCode()));
+                LogUtils.d(TAG, "0x" + Integer.toHexString(hashCode()) + " MSG_LOG mBitmap:" + mBitmap + " mByte:0x" + Integer.toHexString(mByte.hashCode()));
             }
         }
     }

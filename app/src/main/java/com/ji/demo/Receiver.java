@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.ji.util.Log;
+import com.ji.utils.LogUtils;
 
 public class Receiver extends BroadcastReceiver {
     private static final String TAG = "Receiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "onReceive " + intent.getAction());
+        LogUtils.d(TAG, "onReceive " + intent.getAction());
     }
 }
