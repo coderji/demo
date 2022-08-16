@@ -34,8 +34,6 @@ public class CaseFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        String sn = "78945264";
-        Log.d(TAG, "getUnlockCode sn:" + sn + " code:" + getUnlockCode(sn));
     }
 
     private void invokeResources() {

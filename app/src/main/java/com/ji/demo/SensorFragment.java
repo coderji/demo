@@ -32,20 +32,10 @@ public class SensorFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         mSensorManager = (SensorManager) view.getContext().getSystemService(Context.SENSOR_SERVICE);
-        view.findViewById(R.id.sensor_register).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mSensorManager.registerListener(mSensorEventListener,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
-                        SensorManager.SENSOR_DELAY_NORMAL, new Handler());
-            }
-        });
-        view.findViewById(R.id.sensor_unregister).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mSensorManager.unregisterListener(mSensorEventListener);
-            }
-        });
+        view.findViewById(R.id.sensor_register).setOnClickListener(v -> mSensorManager.registerListener(mSensorEventListener,
+                mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
+                SensorManager.SENSOR_DELAY_NORMAL, new Handler()));
+        view.findViewById(R.id.sensor_unregister).setOnClickListener(v -> mSensorManager.unregisterListener(mSensorEventListener));
     }
 
     private final SensorEventListener mSensorEventListener = new SensorEventListener() {

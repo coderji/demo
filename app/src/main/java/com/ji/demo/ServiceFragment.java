@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.view.LayoutInflater;
@@ -30,7 +31,6 @@ public class ServiceFragment extends BaseFragment {
     private static final String TAG = "ServiceFragment";
     private IRemoteDemo mRemoteDemo;
     private TextView mDataView;
-    private Handler mHandler = new Handler();
 
     @Nullable
     @Override
@@ -68,7 +68,7 @@ public class ServiceFragment extends BaseFragment {
         mDataView = view.findViewById(R.id.service_data);
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.v(TAG, "onServiceConnected");
@@ -87,16 +87,11 @@ public class ServiceFragment extends BaseFragment {
         }
     };
 
-    private IRemoteCallback.Stub mRemoteCallback = new IRemoteCallback.Stub() {
+    private final IRemoteCallback.Stub mRemoteCallback = new IRemoteCallback.Stub() {
         @Override
         public void dataCallback(final String data) throws RemoteException {
             Log.v(TAG, "dataCallback data:" + data);
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mDataView.setText(data);
-                }
-            });
+            new Handler(Looper.getMainLooper()).post(() -> mDataView.setText(data));
         }
     };
 
@@ -108,14 +103,15 @@ public class ServiceFragment extends BaseFragment {
         private String mData;
         private boolean mRun = false;
 
-        private IRemoteDemo.Stub mBinder = new IRemoteDemo.Stub() {
+        private final IRemoteDemo.Stub mBinder = new IRemoteDemo.Stub() {
             @Override
             public int register(IRemoteCallback callback) throws RemoteException {
                 Log.v(TAG, "register");
                 if (callback != null) {
                     mCallbacks.register(callback);
+                    return 0;
                 }
-                return 0;
+                return -1;
             }
 
             @Override
@@ -123,8 +119,9 @@ public class ServiceFragment extends BaseFragment {
                 Log.v(TAG, "unregister");
                 if (callback != null) {
                     mCallbacks.unregister(callback);
+                    return 0;
                 }
-                return 0;
+                return -1;
             }
 
             @Override
@@ -134,8 +131,11 @@ public class ServiceFragment extends BaseFragment {
 
             @Override
             public int setData(String data) throws RemoteException {
-                mData = data;
-                return 0;
+                if (data != null) {
+                    mData = data;
+                    return 0;
+                }
+                return -1;
             }
         };
 
@@ -162,28 +162,24 @@ public class ServiceFragment extends BaseFragment {
             }
 
             mRun = true;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    while (mRun) {
-                        mData = String.valueOf(System.currentTimeMillis());
-                        Log.v(TAG, "run mData:" + mData);
-                        final int N = mCallbacks.beginBroadcast();
-                        for (int i = 0; i < N; i++) {
-                            try {
-                                mCallbacks.getBroadcastItem(i).dataCallback(mData);
-                            } catch (RemoteException e) {
-                                Log.e(TAG, "run dataCallback", e);
-                            }
-                        }
-                        mCallbacks.finishBroadcast();
-
+            new Thread(() -> {
+                while (mRun) {
+                    mData = String.valueOf(System.currentTimeMillis());
+                    Log.v(TAG, "run mData:" + mData);
+                    final int N = mCallbacks.beginBroadcast();
+                    for (int i = 0; i < N; i++) {
                         try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            Log.e(TAG, "run sleep", e);
+                            mCallbacks.getBroadcastItem(i).dataCallback(mData);
+                        } catch (RemoteException e) {
+                            Log.e(TAG, "run dataCallback", e);
                         }
+                    }
+                    mCallbacks.finishBroadcast();
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Log.e(TAG, "run sleep", e);
                     }
                 }
             }).start();
