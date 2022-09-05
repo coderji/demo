@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ji.utils.BaseFragment;
 import com.ji.utils.LogUtils;
 
 import java.io.InputStream;

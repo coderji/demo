@@ -20,7 +20,10 @@ import java.util.Locale;
  *             (see all_log in your current path)
  *
  * v1.1
- *   all log file mark time
+ *   APLog
+ *
+ * v1.2
+ *   crash_log
   */
 public class MergeLog {
     private static final String TAG = "MergeLog";
@@ -190,7 +193,7 @@ public class MergeLog {
     }
 
     private static boolean needMerge(String file) {
-        String[] types = new String[]{"events_log", "kernel_log", "main_log", "sys_log"};
+        String[] types = new String[]{"events_log", "kernel_log", "main_log", "sys_log", "crash_log"};
         for (String type : types) {
             if (file.startsWith(type)) {
                 return true;
@@ -202,7 +205,7 @@ public class MergeLog {
     public static void main(String[] args) {
         long begin = System.currentTimeMillis();
         log("merge.jar version 1.1.20220728");
-        log("merge events_log, kernel_log, main_log, sys_log to all_log");
+        log("merge events_log, kernel_log, main_log, sys_log, crash_log to all_log");
         log("Usage: java -jar [debuglogger path]");
         log("                 (see all_log in your debuglogger path)");
         log("       java -jar [file1 file2 file3 ...]");

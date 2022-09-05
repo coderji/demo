@@ -1,5 +1,7 @@
 package com.ji.demo;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +10,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ji.utils.BaseFragment;
 import com.ji.utils.LogUtils;
 
 import java.io.File;
@@ -34,6 +35,7 @@ public class CaseFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        is5GHzBandSupported(view.getContext());
     }
 
     private void invokeResources() {
@@ -66,5 +68,10 @@ public class CaseFragment extends BaseFragment {
             LogUtils.e(TAG, "fillData", e);
         }
         LogUtils.d(TAG, "fillData done");
+    }
+
+    public void is5GHzBandSupported(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        LogUtils.d(TAG, "is5GHzBandSupported " + wifiManager.is5GHzBandSupported());
     }
 }

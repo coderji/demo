@@ -17,6 +17,10 @@ public class LogUtils {
         Log.d(TAG, tag + " - " + msg);
     }
 
+    public static void w(String tag, String msg) {
+        Log.d(TAG, tag + " - " + msg);
+    }
+
     public static void e(String tag, String msg) {
         Log.e(TAG, tag + " - " + msg);
     }

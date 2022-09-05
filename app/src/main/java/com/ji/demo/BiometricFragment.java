@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 import androidx.core.os.CancellationSignal;
 
-import com.ji.utils.BaseFragment;
 import com.ji.utils.LogUtils;
 
 public class BiometricFragment extends BaseFragment {

@@ -24,7 +24,6 @@ import androidx.annotation.Nullable;
 
 import com.ji.remotedemo.IRemoteCallback;
 import com.ji.remotedemo.IRemoteDemo;
-import com.ji.utils.BaseFragment;
 import com.ji.utils.LogUtils;
 import com.ji.utils.ThreadUtils;
 
