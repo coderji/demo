@@ -13,21 +13,14 @@ import java.util.Date;
 import java.util.Locale;
 
 /*
- * v1.0
  *   java -jar [debuglogger path]
  *             (see all_log in your debuglogger path)
  *   java -jar [file1 file2 file3 ...]
  *             (see all_log in your current path)
- *
- * v1.1
- *   APLog
- *
- * v1.2
- *   crash_log
-  */
+ */
 public class MergeLog {
     private static final String TAG = "MergeLog";
-    private static boolean DEBUG = false;
+    private static boolean DEBUG = true;
 
     private static void mergeFile(String[] files, String outDir) {
         if (DEBUG) log("mergeFile files:" + Arrays.toString(files));
@@ -51,7 +44,7 @@ public class MergeLog {
         try {
             int allLogIndex = 0;
             int line = 0;
-            FileWriter fw = new FileWriter(outDir + File.separator + "all_log_" + allLogIndex + "_" + getTime(strings[0]) + ".txt");
+            FileWriter fw = new FileWriter(outDir + File.separator + "all_log_" + allLogIndex + "_" + getTime(strings[findMin(strings)]) + ".txt");
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(timezone);
             while (true) {
@@ -115,20 +108,23 @@ public class MergeLog {
     private static String getTime(String s) {
         // 07-04 13:02:29.039012
         if (DEBUG) log("getTime s:" + s);
-        StringBuilder time = new StringBuilder();
-        time.append(s.charAt(0));
-        time.append(s.charAt(1));
-        time.append(s.charAt(3));
-        time.append(s.charAt(4));
-        time.append('-');
-        time.append(s.charAt(6));
-        time.append(s.charAt(7));
-        time.append(s.charAt(9));
-        time.append(s.charAt(10));
-        time.append(s.charAt(12));
-        time.append(s.charAt(13));
-        if (DEBUG) log("getTime time:" + time.toString());
-        return time.toString();
+        if (s != null) {
+            StringBuilder time = new StringBuilder();
+            time.append(s.charAt(0));
+            time.append(s.charAt(1));
+            time.append(s.charAt(3));
+            time.append(s.charAt(4));
+            time.append('-');
+            time.append(s.charAt(6));
+            time.append(s.charAt(7));
+            time.append(s.charAt(9));
+            time.append(s.charAt(10));
+            time.append(s.charAt(12));
+            time.append(s.charAt(13));
+            if (DEBUG) log("getTime time:" + time.toString());
+            return time.toString();
+        }
+        return null;
     }
 
     private static int compare(String a, String b) {
@@ -193,7 +189,7 @@ public class MergeLog {
     }
 
     private static boolean needMerge(String file) {
-        String[] types = new String[]{"events_log", "kernel_log", "main_log", "sys_log", "crash_log"};
+        String[] types = new String[]{"crash_log", "events_log", "kernel_log", "main_log", "sys_log"};
         for (String type : types) {
             if (file.startsWith(type)) {
                 return true;
@@ -205,7 +201,7 @@ public class MergeLog {
     public static void main(String[] args) {
         long begin = System.currentTimeMillis();
         log("merge.jar version 1.1.20220728");
-        log("merge events_log, kernel_log, main_log, sys_log, crash_log to all_log");
+        log("merge crash_log, events_log, kernel_log, main_log, sys_log to all_log");
         log("Usage: java -jar [debuglogger path]");
         log("                 (see all_log in your debuglogger path)");
         log("       java -jar [file1 file2 file3 ...]");
