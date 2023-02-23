@@ -14,3 +14,13 @@ Java_com_ji_demo_CaseFragment_getUnlockCode(JNIEnv *env, jclass clazz, jstring s
     env->ReleaseStringChars(sn, snBuff);
     return env->NewStringUTF(code);
 }
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_ji_demo_CaseFragment_getCrash(JNIEnv *env, jclass clazz) {
+    char s = 's';
+    char c = *(&s - 0xFFFFFFFF);
+    if (c) {
+        LOG("c:%c", c);
+    }
+    return env->NewStringUTF("getCrash");
+}

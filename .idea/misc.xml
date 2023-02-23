@@ -3,6 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Documents/DemoApp/app/src/main/res/layout/activity_main.xml" value="0.16197916666666667" />
+        <entry key="..\:/Documents/DemoApp/app/src/main/res/layout/fragment_biometric.xml" value="0.19322916666666667" />
+        <entry key="..\:/Documents/DemoApp/app/src/main/res/layout/fragment_case.xml" value="0.19322916666666667" />
+        <entry key="..\:/Documents/DemoApp/app/src/main/res/layout/fragment_leak.xml" value="0.19322916666666667" />
+        <entry key="..\:/Documents/DemoApp/app/src/main/res/layout/fragment_notification.xml" value="0.19322916666666667" />
+        <entry key="..\:/Documents/DemoApp/app/src/main/res/layout/fragment_sensor.xml" value="0.19322916666666667" />
+        <entry key="..\:/Documents/DemoApp/app/src/main/res/layout/fragment_service.xml" value="0.19322916666666667" />
         <entry key="..\:/Tool/Demo/app/src/main/res/layout/activity_main.xml" value="0.28442028985507245" />
         <entry key="..\:/Tool/Demo/app/src/main/res/layout/fragment_biometric.xml" value="0.28442028985507245" />
         <entry key="..\:/Tool/Demo/app/src/main/res/layout/fragment_case.xml" value="0.3605072463768116" />

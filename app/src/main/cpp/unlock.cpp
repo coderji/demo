@@ -23,7 +23,6 @@ void getUnlockCode(const char *sn, int length, char *code) {
         ptr += sprintf(ptr, "%02X", code_buff[i]);
     }
     *ptr = '\0';
-    LOG("getUnlockCode swapSN:%s code:%s", sn_buff, code);
 }
 
 void swapSN(char *sn) {

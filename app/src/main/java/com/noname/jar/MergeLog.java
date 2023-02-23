@@ -200,7 +200,7 @@ public class MergeLog {
 
     public static void main(String[] args) {
         long begin = System.currentTimeMillis();
-        log("merge.jar version 1.1.20220728");
+        log("merge.jar version 20221215");
         log("merge crash_log, events_log, kernel_log, main_log, sys_log to all_log");
         log("Usage: java -jar [debuglogger path]");
         log("                 (see all_log in your debuglogger path)");
