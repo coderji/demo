@@ -1,8 +1,11 @@
 #include <stdio.h>
+#include<stdlib.h>
 #include <string.h>
 
 #define LINE_MAX_CAHRS  200
 #define CMD_ERROR       256
+
+int push(char strLine[]);
 
 int main(int argc, char *argv[]) {
     FILE *fp;
@@ -26,8 +29,8 @@ int main(int argc, char *argv[]) {
             return -2;
         }
     } else {
-    	printf("%s not found\n", fileName);
-    	return -1;
+        printf("%s not found\n", fileName);
+        return -1;
     }
 
     return 0;
