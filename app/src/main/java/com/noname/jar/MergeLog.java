@@ -36,9 +36,8 @@ public class MergeLog {
         }
 
         try {
-            int allLogIndex = 0;
             int line = 0;
-            FileWriter fw = new FileWriter(dir + File.separator + "all_log_" + allLogIndex + ".txt");
+            FileWriter fw = new FileWriter(dir + File.separator + "log_" + formatTime(strings[0]) + ".txt");
             BufferedWriter bw = new BufferedWriter(fw);
             while (true) {
                 int min = findMin(strings);
@@ -56,8 +55,7 @@ public class MergeLog {
                     bw.close();
                     fw.close();
 
-                    allLogIndex++;
-                    fw = new FileWriter(dir + File.separator + "all_log_" + allLogIndex + ".txt");
+                    fw = new FileWriter(dir + File.separator + "log_" + formatTime(strings[min]) + ".txt");
                     bw = new BufferedWriter(fw);
                 }
             }
@@ -117,6 +115,13 @@ public class MergeLog {
         return 0;
     }
 
+    private static String formatTime(String start) {
+        return start.substring(0, 14)
+                .replace(" ", "")
+                .replace("-", "")
+                .replace(":", "");
+    }
+
     private static void log(String s) {
         System.out.println(new SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(new Date()) + " " + TAG + ": " + s);
     }
@@ -130,42 +135,15 @@ public class MergeLog {
         File[] logs = new File(dir).listFiles();
         if (logs != null) {
             ArrayList<String> mergeLogList = new ArrayList<>();
-            File bugreport = null;
             for (File log : logs) {
                 if (needMerge(log.getName())) {
                     mergeLogList.add(log.toString());
-                } else if (log.getName().contains("bugreport")) {
-                    bugreport = log;
                 }
             }
             if (mergeLogList.size() > 0) {
                 log("mergeDir mtk");
                 String[] mergeLogs = mergeLogList.toArray(new String[0]);
                 mergeFile(mergeLogs, dir);
-            } else if (bugreport != null) {
-                log("mergeDir bugreport");
-                try {
-                    FileWriter fw = new FileWriter(dir + "\\merge.bat");
-                    BufferedWriter bw = new BufferedWriter(fw);
-                    bw.write("mkdir merge");
-                    bw.newLine();
-                    bw.write("sed -n '/------ EVENT LOG .*/,/duration.*EVENT LOG/p' " + bugreport + " > " + dir + "\\merge\\events_log.txt");
-                    bw.newLine();
-                    bw.write("sed -n '/------ KERNEL LOG .*/,/duration.*KERNEL LOG/p' " + bugreport + " > " + dir + "\\merge\\kernel_log.txt");
-                    bw.newLine();
-                    bw.write("sed -n '/------ SYSTEM LOG .*/,/duration.*SYSTEM LOG/p' " + bugreport + " > " + dir + "\\merge\\sys_log.txt");
-                    bw.newLine();
-                    bw.write("java -jar D:\\Logs\\demo\\app\\src\\main\\bat\\merge.jar " + dir + "\\merge");
-                    bw.newLine();
-                    bw.flush();
-                    bw.close();
-                    fw.close();
-
-                    Process p = Runtime.getRuntime().exec("cmd /c cd " + dir + " && merge.bat && mv merge.bat merge");
-                    p.waitFor();
-                } catch (Exception e) {
-                    log("mergeDir", e);
-                }
             }
         }
     }
@@ -181,7 +159,7 @@ public class MergeLog {
     }
 
     public static void main(String[] args) {
-        log("merge.jar version 20230620");
+        log("merge.jar version 20231012");
         log("main args:" + Arrays.toString(args));
         long begin = System.currentTimeMillis();
         if (args.length == 1) {
