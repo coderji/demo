@@ -135,15 +135,37 @@ public class MergeLog {
         File[] logs = new File(dir).listFiles();
         if (logs != null) {
             ArrayList<String> mergeLogList = new ArrayList<>();
+            File bugreport = null;
             for (File log : logs) {
                 if (needMerge(log.getName())) {
                     mergeLogList.add(log.toString());
+                } else if (log.getName().contains("bugreport")) {
+                    bugreport = log;
                 }
             }
             if (mergeLogList.size() > 0) {
                 log("mergeDir mtk");
                 String[] mergeLogs = mergeLogList.toArray(new String[0]);
                 mergeFile(mergeLogs, dir);
+            } else if (bugreport != null) {
+                log("mergeDir bugreport");
+                try {
+                    FileWriter fw = new FileWriter(dir + "\\merge.bat");
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    bw.write("mkdir merge");
+                    bw.newLine();
+                    bw.write("sed -n '/------ EVENT LOG .*/,/duration.*EVENT LOG/p' " + bugreport + " > " + dir + "\\merge\\events_log.txt");
+                    bw.newLine();
+                    bw.write("sed -n '/------ KERNEL LOG .*/,/duration.*KERNEL LOG/p' " + bugreport + " > " + dir + "\\merge\\kernel_log.txt");
+                    bw.newLine();
+                    bw.write("sed -n '/------ SYSTEM LOG .*/,/duration.*SYSTEM LOG/p' " + bugreport + " > " + dir + "\\merge\\sys_log.txt");
+                    bw.newLine();
+                    bw.flush();
+                    bw.close();
+                    fw.close();
+                } catch (Exception e) {
+                    log("mergeDir", e);
+                }
             }
         }
     }
