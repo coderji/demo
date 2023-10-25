@@ -37,7 +37,8 @@ public class MergeLog {
 
         try {
             int line = 0;
-            FileWriter fw = new FileWriter(dir + File.separator + "log_" + formatTime(strings[0]) + ".txt");
+            String time = strings[0] != null ? strings[0] : (strings[1] != null ? strings[1] : strings[2]);
+            FileWriter fw = new FileWriter(dir + File.separator + "log_" + formatTime(time) + ".txt");
             BufferedWriter bw = new BufferedWriter(fw);
             while (true) {
                 int min = findMin(strings);
@@ -105,7 +106,7 @@ public class MergeLog {
 
     private static int compare(String a, String b) {
         String format = "07-04 13:02:29.906803";
-        for (int i = 0; i < format.length(); i++) {
+        for (int i = 0; i < format.length() && i < a.length() && i < b.length(); i++) {
             if (a.charAt(i) > b.charAt(i)) {
                 return 1;
             } else if (a.charAt(i) < b.charAt(i)) {
