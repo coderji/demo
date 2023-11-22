@@ -1,0 +1,1 @@
+java -jar D:\Tools\Bat\merge.jar %1

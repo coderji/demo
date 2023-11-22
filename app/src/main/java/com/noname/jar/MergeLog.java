@@ -172,7 +172,8 @@ public class MergeLog {
     }
 
     private static boolean needMerge(String file) {
-        String[] types = new String[]{"crash_log", "events_log", "main_log", "kernel_log", "sys_log"};
+        String[] types = new String[]{"crash_log", "events_log", "main_log", "kernel_log", "sys_log",
+                "SYS_ANDROID_EVENT_LOG", "SYS_ANDROID_LOG", "SYS_ANDROID_RADIO_LOG"};
         for (String type : types) {
             if (file.contains(type)) {
                 return true;
@@ -182,7 +183,7 @@ public class MergeLog {
     }
 
     public static void main(String[] args) {
-        log("merge.jar version 20231012");
+        log("merge.jar version 20231026");
         log("main args:" + Arrays.toString(args));
         long begin = System.currentTimeMillis();
         if (args.length == 1) {

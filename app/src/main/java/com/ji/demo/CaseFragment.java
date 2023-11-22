@@ -49,7 +49,7 @@ public class CaseFragment extends BaseFragment {
             public void onClick(View v) {
                 LogUtils.d(TAG, "case_anr");
                 try {
-                    Thread.sleep(60000);
+                    Thread.sleep(15000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
