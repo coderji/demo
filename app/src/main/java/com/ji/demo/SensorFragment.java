@@ -13,10 +13,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.ji.utils.LogUtils;
 
-public class SensorFragment extends BaseFragment {
+public class SensorFragment extends Fragment {
     private static final String TAG = "SensorFragment";
     private SensorManager mSensorManager;
 

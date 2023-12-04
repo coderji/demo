@@ -12,12 +12,13 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.ji.utils.LogUtils;
 
 import java.io.InputStream;
 
-public class LeakFragment extends BaseFragment {
+public class LeakFragment extends Fragment {
     private static final String TAG = "LeakFragment";
     private final Handler mLeaksHandler = new LeaksHandler();
     private static final int MSG_REPLACE = 0;

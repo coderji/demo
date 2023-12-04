@@ -8,10 +8,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.ji.utils.LogUtils;
 
-public class CaseFragment extends BaseFragment {
+public class CaseFragment extends Fragment {
     private static final String TAG = "CaseFragment";
 
     static {

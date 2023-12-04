@@ -21,13 +21,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.ji.remotedemo.IRemoteCallback;
 import com.ji.remotedemo.IRemoteDemo;
 import com.ji.utils.LogUtils;
 import com.ji.utils.ThreadUtils;
 
-public class ServiceFragment extends BaseFragment {
+public class ServiceFragment extends Fragment {
     private static final String TAG = "ServiceFragment";
     private IRemoteDemo mRemoteDemo;
     private TextView mDataView;
