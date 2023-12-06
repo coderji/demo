@@ -6,7 +6,7 @@
 #define LOG(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_ji_demo_CaseFragment_getUnlockCode(JNIEnv *env, jclass clazz, jstring sn) {
+Java_com_ji_demo_MainActivity_getUnlockCode(JNIEnv *env, jclass clazz, jstring sn) {
     const jchar *snBuff = env->GetStringChars(sn, nullptr);
     const jsize snLength = env->GetStringLength(sn);
     char code[CODE_LENGTH + 1];
@@ -16,7 +16,7 @@ Java_com_ji_demo_CaseFragment_getUnlockCode(JNIEnv *env, jclass clazz, jstring s
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_ji_demo_CaseFragment_getCrash(JNIEnv *env, jclass clazz) {
+Java_com_ji_demo_MainActivity_getCrash(JNIEnv *env, jclass clazz) {
     char s = 's';
     char c = *(&s - 0xFFFFFFFF);
     if (c) {

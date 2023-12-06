@@ -3,10 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.ji.demo">
 
-    <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -25,17 +21,5 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.ji.demo.ServiceFragment$FgService" android:exported="true">
-            <intent-filter>
-                <action android:name="com.ji.demo.FgService"/>
-            </intent-filter>
-        </service>
-
-        <receiver android:name="com.ji.demo.Receiver" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
-            </intent-filter>
-        </receiver>
     </application>
 </manifest>
