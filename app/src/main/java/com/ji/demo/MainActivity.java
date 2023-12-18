@@ -13,6 +13,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.AndroidRuntimeException;
 import android.util.Log;
@@ -41,7 +42,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
 //        biometric();
-//        crash();
+        crash();
 //        handle();
 //        notification();
 //        sensor();
@@ -60,7 +61,7 @@ public class MainActivity extends FragmentActivity {
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
                 Toast.makeText(getBaseContext(),
-                                "NewAuthentication error: " + errString, Toast.LENGTH_SHORT)
+                                "Authentication error: " + errString, Toast.LENGTH_SHORT)
                         .show();
             }
 
@@ -69,13 +70,13 @@ public class MainActivity extends FragmentActivity {
                     @NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
                 Toast.makeText(getBaseContext(),
-                        "NewAuthentication succeeded", Toast.LENGTH_SHORT).show();
+                        "Authentication succeeded", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();
-                Toast.makeText(getBaseContext(), "NewAuthentication failed", Toast.LENGTH_SHORT)
+                Toast.makeText(getBaseContext(), "Authentication failed", Toast.LENGTH_SHORT)
                         .show();
             }
         });
@@ -128,7 +129,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void handle() {
-        Handler handler = new Handler() {
+        Handler handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 Log.d(TAG, "handleMessage " + msg.what);
