@@ -3,12 +3,10 @@ plugins {
 }
 
 android {
-    compileSdk 32
-    buildToolsVersion "32.0.0"
+    compileSdk 34
     defaultConfig {
         applicationId "com.ji.demo"
-        minSdk 30
-        targetSdk 32
+        minSdk 33
         versionCode 1
         versionName "1.0"
         externalNativeBuild {
@@ -22,10 +20,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
     externalNativeBuild {
         cmake {

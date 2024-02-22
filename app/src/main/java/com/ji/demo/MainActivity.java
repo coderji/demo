@@ -34,7 +34,7 @@ public class MainActivity extends FragmentActivity {
         System.loadLibrary("demo");
     }
     public static native String getCrash();
-    public static native String getUnlockCode();
+    public static native String getUnlockCode(String sn);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +43,7 @@ public class MainActivity extends FragmentActivity {
 
 //        biometric();
         crash();
+//        Log.d(TAG, "getUnlockCode " + getUnlockCode("b2b4b95c"));
 //        handle();
 //        notification();
 //        sensor();
@@ -161,7 +162,7 @@ public class MainActivity extends FragmentActivity {
         NotificationManager notificationManager = (NotificationManager) getBaseContext()
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationChannel channel =
-                new NotificationChannel("NotificationChannelID", "NotificationChannel",
+                new NotificationChannel("ChannelId", "ChannelName",
                         NotificationManager.IMPORTANCE_HIGH);
         notificationManager.createNotificationChannel(channel);
         builder.setChannelId(channel.getId());
