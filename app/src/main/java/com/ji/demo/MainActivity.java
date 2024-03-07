@@ -28,7 +28,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 public class MainActivity extends FragmentActivity {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "Demo-MainActivity";
 
     static {
         System.loadLibrary("demo");
@@ -42,11 +42,11 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
 //        biometric();
-        crash();
-//        Log.d(TAG, "getUnlockCode " + getUnlockCode("b2b4b95c"));
+//        crash();
 //        handle();
 //        notification();
 //        sensor();
+        uncaught();
     }
 
     private void biometric() {
@@ -238,5 +238,22 @@ public class MainActivity extends FragmentActivity {
             }
         });
         ((ViewGroup) findViewById(R.id.main_content)).addView(unregister);
+    }
+
+    private void uncaught() {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(@NonNull Thread thread, @NonNull Throwable throwable) {
+                Log.d(TAG, "uncaughtException" + thread.getName(), throwable);
+                System.exit(10);
+            }
+        });
+
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                throw new AndroidRuntimeException("uncaught");
+            }
+        }, 2000);
     }
 }
