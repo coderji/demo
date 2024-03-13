@@ -43,10 +43,11 @@ public class MainActivity extends FragmentActivity {
 
 //        biometric();
 //        crash();
+        getUnlockCode("JS2250551915");
 //        handle();
 //        notification();
 //        sensor();
-        uncaught();
+//        uncaught();
     }
 
     private void biometric() {

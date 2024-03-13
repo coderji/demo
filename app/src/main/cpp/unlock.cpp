@@ -4,39 +4,44 @@
 #include "md5.h"
 #include "unlock.h"
 
-#define TAG "Demo"
+#define TAG "Demo-Unlock"
 #define LOG(...) __android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__)
 
 void getUnlockCode(const char *sn, int length, char *code) {
-    unsigned char sn_buff[SN_LENGTH + 1];
-    unsigned char code_buff[SN_LENGTH];
+    unsigned char sn_buff[32] = {0};
+    unsigned char code_buff[32] = {0};
     char *ptr = code;
     int i;
 
-    for (i = 0; i < length && i < SN_LENGTH; i++) {
-        sn_buff[i] = *(sn + i * 2);
+    if (length == 8) {
+        sn_buff[0] = *(sn + 1);
+        sn_buff[1] = *sn;
+        sn_buff[2] = *(sn + 3);
+        sn_buff[3] = *(sn + 2);
+        strcpy((char *) sn_buff + 4, sn + 4);
+    } else if (length == 12) {
+        sn_buff[0] = *(sn + 1);
+        sn_buff[1] = *sn;
+        sn_buff[2] = *(sn + 3);
+        sn_buff[3] = *(sn + 2);
+        sn_buff[4] = *(sn + 5);
+        sn_buff[5] = *(sn + 4);
+        sn_buff[6] = *(sn + 7);
+        sn_buff[7] = *(sn + 6);
+        sn_buff[8] = *(sn + 9);
+        sn_buff[9] = *(sn + 8);
+        sn_buff[10] = *(sn + 11);
+        sn_buff[11] = *(sn + 10);
     }
-    sn_buff[i] = '\0';
-    swapSN((char *) sn_buff);
     getMD5(sn_buff, code_buff);
-    for (i = 0; i < SN_LENGTH; i++) {
+    for (i = 0; i < 16; i++) {
         ptr += sprintf(ptr, "%02X", code_buff[i]);
     }
     *ptr = '\0';
-}
-
-void swapSN(char *sn) {
-    unsigned int length = strlen(sn);
-    unsigned int i;
-    char c;
-    if (length > 4) {
-        for (i = 0; i < length - 4; i++) {
-            if (i % 2 == 0) {
-                c = *(sn + i);
-                *(sn + i) = *(sn + i + 1);
-                *(sn + i + 1) = c;
-            }
-        }
+    if (0 == sn_buff[0]) {
+        LOG("getUnlockCode sn/sn_buff:%s code:%s", sn, code);
+    } else {
+        LOG("getUnlockCode sn:%s sn_buff:%s code:%s", sn, sn_buff, code);
     }
 }
 
