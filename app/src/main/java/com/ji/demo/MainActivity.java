@@ -43,11 +43,17 @@ public class MainActivity extends FragmentActivity {
 
 //        biometric();
 //        crash();
-        getUnlockCode("JS2250551915");
+//        getUnlockCode("JS2250551915");
 //        handle();
 //        notification();
 //        sensor();
 //        uncaught();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
     }
 
     private void biometric() {

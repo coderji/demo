@@ -172,8 +172,11 @@ public class MergeLog {
     }
 
     private static boolean needMerge(String file) {
-        String[] types = new String[]{"crash_log", "events_log", "main_log", "kernel_log", "sys_log",
-                "SYS_ANDROID_EVENT_LOG", "SYS_ANDROID_LOG", "SYS_ANDROID_RADIO_LOG"};
+        String[] types = new String[]{
+                "crash_log", "events_log", "main_log", "kernel_log", "sys_log",
+                "SYS_ANDROID_EVENT_LOG", "SYS_ANDROID_LOG", "SYS_ANDROID_RADIO_LOG",
+                "events", "mainlog", "radio",
+        };
         for (String type : types) {
             if (file.contains(type)) {
                 return true;
