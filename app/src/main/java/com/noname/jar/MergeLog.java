@@ -37,8 +37,10 @@ public class MergeLog {
 
         try {
             int line = 0;
+            int fileIndex = 0;
+            String fileIndexString = "000";
             String time = strings[0] != null ? strings[0] : (strings[1] != null ? strings[1] : strings[2]);
-            FileWriter fw = new FileWriter(dir + File.separator + "log_" + formatTime(time) + ".txt");
+            FileWriter fw = new FileWriter(dir + File.separator + "log_" + fileIndexString + "_" + formatTime(time) + ".txt");
             BufferedWriter bw = new BufferedWriter(fw);
             while (true) {
                 int min = findMin(strings);
@@ -56,7 +58,16 @@ public class MergeLog {
                     bw.close();
                     fw.close();
 
-                    fw = new FileWriter(dir + File.separator + "log_" + formatTime(strings[min]) + ".txt");
+                    fileIndex++;
+                    if (fileIndex < 10) {
+                        fileIndexString = "00" + fileIndex;
+                    } else if (fileIndex < 100) {
+                        fileIndexString = "0" + fileIndex;
+                    } else {
+                        fileIndexString = String.valueOf(fileIndex);
+                    }
+
+                    fw = new FileWriter(dir + File.separator + "log_" + fileIndexString + "_" + formatTime(strings[min]) + ".txt");
                     bw = new BufferedWriter(fw);
                 }
             }

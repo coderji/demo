@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.graphics.drawable.Icon;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
@@ -46,6 +48,7 @@ public class MainActivity extends FragmentActivity {
 //        getUnlockCode("JS2250551915");
 //        handle();
 //        notification();
+        observer();
 //        sensor();
 //        uncaught();
     }
@@ -54,6 +57,13 @@ public class MainActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unregisterObserver();
     }
 
     private void biometric() {
@@ -202,6 +212,24 @@ public class MainActivity extends FragmentActivity {
             }
         });
         ((ViewGroup) findViewById(R.id.main_content)).addView(cancel);
+    }
+
+    private String mSplit = "ov_start_split_animation";
+    private ContentObserver mSplitObserver = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean sefChange) {
+            int value = Settings.Secure.getInt(getContentResolver(), mSplit, 0);
+            Log.d(TAG, "observer split onChange value:" + value);
+        }
+    };
+
+    private void observer() {
+        getContentResolver().registerContentObserver(
+                Settings.Secure.getUriFor(mSplit), false, mSplitObserver);
+    }
+
+    private void unregisterObserver() {
+        getContentResolver().unregisterContentObserver(mSplitObserver);
     }
 
     private void sensor() {
