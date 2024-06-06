@@ -1,5 +1,6 @@
 package com.ji.demo;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -29,6 +30,9 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public class MainActivity extends FragmentActivity {
     private static final String TAG = "Demo-MainActivity";
 
@@ -45,10 +49,11 @@ public class MainActivity extends FragmentActivity {
 
 //        biometric();
 //        crash();
+        getProp();
 //        getUnlockCode("JS2250551915");
 //        handle();
 //        notification();
-        observer();
+//        observer();
 //        sensor();
 //        uncaught();
     }
@@ -144,6 +149,20 @@ public class MainActivity extends FragmentActivity {
             }
         });
         ((ViewGroup) findViewById(R.id.main_content)).addView(anr);
+    }
+
+    private void getProp() {
+        try {
+            @SuppressLint("PrivateApi")
+            Method get = Class.forName("android.os.SystemProperties")
+                    .getDeclaredMethod("get", String.class, String.class);
+            String prop = "ro.build.fingerprint";
+            String value = (String) get.invoke(null, prop, "Unknown");
+            Log.d(TAG, "getProp prop:" + prop + " value:" + value);
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
+                 InvocationTargetException e) {
+            Log.e(TAG, "getProp", e);
+        }
     }
 
     private void handle() {
