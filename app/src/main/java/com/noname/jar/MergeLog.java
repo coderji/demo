@@ -14,6 +14,7 @@ import java.util.Locale;
 
 public class MergeLog {
     private static final String TAG = "MergeLog";
+    private static final boolean DEBUG = false;
 
     private static void mergeFile(String[] files, String dir) {
         int length = files.length;
@@ -22,6 +23,7 @@ public class MergeLog {
         String[] strings = new String[length];
         String head;
 
+        if (DEBUG) log("mergeFile " + Arrays.toString(files));
         for (int i = 0; i < length; i++) {
             try {
                 frs[i] = new FileReader(files[i]);
@@ -49,7 +51,14 @@ public class MergeLog {
                 }
                 bw.write(strings[min]);
                 bw.newLine();
-                strings[min] = brs[min].readLine();
+                while (true) {
+                    strings[min] = brs[min].readLine();
+                    if (containTime(strings[min]) || strings[min] == null) {
+                        break;
+                    } else {
+                        if (DEBUG) log("mergeFile " + files[min] + " skip " + strings[min]);
+                    }
+                }
 
                 line++;
                 if (line >= 500000) {
@@ -189,7 +198,7 @@ public class MergeLog {
                 "events", "mainlog", "radio",
         };
         for (String type : types) {
-            if (file.contains(type)) {
+            if (file.startsWith(type)) {
                 return true;
             }
         }
@@ -197,7 +206,7 @@ public class MergeLog {
     }
 
     public static void main(String[] args) {
-        log("merge.jar version 20231026");
+        log("merge.jar version 20250113");
         log("main args:" + Arrays.toString(args));
         long begin = System.currentTimeMillis();
         if (args.length == 1) {
