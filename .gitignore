@@ -7,5 +7,3 @@
 .externalNativeBuild
 .cxx
 local.properties
-app/src/main/c/*.o
-app/src/main/c/demo
