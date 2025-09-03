@@ -23,7 +23,6 @@ public class MergeLog {
         String[] strings = new String[length];
         String head;
 
-        if (DEBUG) log("mergeFile " + Arrays.toString(files));
         for (int i = 0; i < length; i++) {
             try {
                 frs[i] = new FileReader(files[i]);
@@ -165,7 +164,7 @@ public class MergeLog {
                 }
             }
             if (mergeLogList.size() > 0) {
-                log("mergeDir mtk");
+                log("mergeDir:" + mergeLogList);
                 String[] mergeLogs = mergeLogList.toArray(new String[0]);
                 mergeFile(mergeLogs, dir);
             } else if (bugreport != null) {
@@ -193,12 +192,12 @@ public class MergeLog {
 
     private static boolean needMerge(String file) {
         String[] types = new String[]{
-                "crash_log", "events_log", "main_log", "kernel_log", "sys_log",
-                "SYS_ANDROID_EVENT_LOG", "SYS_ANDROID_LOG", "SYS_ANDROID_RADIO_LOG",
-                "events", "mainlog", "radio",
+                "crash", "events", "main", "kernel", "radio", "sys",
+                "-c", "-e", "-m", "-k", "-r", "-s",
+                "ANDROID_LOG", "EVENT_LOG", "RADIO_LOG",
         };
         for (String type : types) {
-            if (file.startsWith(type)) {
+            if (file.contains(type)) {
                 return true;
             }
         }
@@ -206,13 +205,13 @@ public class MergeLog {
     }
 
     public static void main(String[] args) {
-        log("merge.jar version 20250113");
-        log("main args:" + Arrays.toString(args));
+        log("version 20250903");
+        log("args:" + Arrays.toString(args));
         long begin = System.currentTimeMillis();
         if (args.length == 1) {
             mergeDir(args[0]);
         }
         long end = System.currentTimeMillis();
-        log("main done, time:" + (end - begin) / 1000 + "s," + (end - begin) % 1000 + "ms");
+        log("done " + (end - begin) / 1000 + "s" + (end - begin) % 1000 + "ms");
     }
 }
