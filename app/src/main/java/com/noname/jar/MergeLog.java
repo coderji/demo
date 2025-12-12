@@ -157,17 +157,13 @@ public class MergeLog {
             ArrayList<String> mergeLogList = new ArrayList<>();
             File bugreport = null;
             for (File log : logs) {
-                if (needMerge(log.getName())) {
-                    mergeLogList.add(log.toString());
-                } else if (log.getName().contains("bugreport")) {
+                if (log.getName().contains("bugreport")) {
                     bugreport = log;
+                } else if (needMerge(log.getName())) {
+                    mergeLogList.add(log.toString());
                 }
             }
-            if (mergeLogList.size() > 0) {
-                log("mergeDir:" + mergeLogList);
-                String[] mergeLogs = mergeLogList.toArray(new String[0]);
-                mergeFile(mergeLogs, dir);
-            } else if (bugreport != null) {
+            if (bugreport != null) {
                 log("mergeDir bugreport");
                 try {
                     FileWriter fw = new FileWriter(dir + "\\merge.bat");
@@ -186,6 +182,10 @@ public class MergeLog {
                 } catch (Exception e) {
                     log("mergeDir", e);
                 }
+            } else if (mergeLogList.size() > 0) {
+                log("mergeDir:" + mergeLogList);
+                String[] mergeLogs = mergeLogList.toArray(new String[0]);
+                mergeFile(mergeLogs, dir);
             }
         }
     }
@@ -205,7 +205,7 @@ public class MergeLog {
     }
 
     public static void main(String[] args) {
-        log("version 20250903");
+        log("version 20251212");
         log("args:" + Arrays.toString(args));
         long begin = System.currentTimeMillis();
         if (args.length == 1) {
