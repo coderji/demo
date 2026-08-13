@@ -14,8 +14,11 @@ import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +26,8 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity {
@@ -154,6 +159,55 @@ public class MainActivity extends FragmentActivity {
         });
     }
 
+    private void testProp() {
+        try {
+            Method get = Class.forName("android.os.SystemProperties")
+                    .getDeclaredMethod("get", String.class, String.class);
+            String prop = "ro.build.fingerprint";
+            String value = (String) get.invoke(null, prop, "Unknown");
+            Log.d(TAG, "testProp prop:" + prop + " value:" + value);
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
+                 InvocationTargetException e) {
+            Log.e(TAG, "testProp", e);
+        }
+    }
+
+    private void testCrash() {
+        Button je = new Button(getBaseContext());
+        je.setText("je");
+        je.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                throw new AndroidRuntimeException("JE");
+            }
+        });
+        ((ViewGroup) findViewById(R.id.main_content)).addView(je);
+
+        Button ne = new Button(getBaseContext());
+        ne.setText("ne");
+        ne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getNativeHello();
+            }
+        });
+        ((ViewGroup) findViewById(R.id.main_content)).addView(ne);
+
+        Button anr = new Button(getBaseContext());
+        anr.setText("anr");
+        anr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    Thread.sleep(15000);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "anr", e);
+                }
+            }
+        });
+        ((ViewGroup) findViewById(R.id.main_content)).addView(anr);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,7 +219,6 @@ public class MainActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-        testBiometric();
     }
 
     @Override
