@@ -32,12 +32,15 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity {
     private static final String TAG = "Demo-MainActivity";
-    private NotificationManager mNotificationManager;
     private static final int ID = 0;
+
+    private NotificationManager mNotificationManager;
+    private ViewGroup mContent;
 
     static {
         System.loadLibrary("demo");
     }
+
     public static native String getNativeHello();
 
     private IDemoInterface mIDemoInterface = null;
@@ -63,6 +66,13 @@ public class MainActivity extends FragmentActivity {
         }
     };
 
+    private void addButton(String text, View.OnClickListener listener) {
+        Button button = new Button(this);
+        button.setText(text);
+        button.setOnClickListener(listener);
+        mContent.addView(button);
+    }
+
     private void testBindService() {
         Intent intent = new Intent();
         intent.setAction("com.ji.demo.AIDL_SERVICE");
@@ -83,10 +93,6 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void testSendNotify() {
-        if (mNotificationManager == null) {
-            mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        }
-
         Notification.Builder builder = new Notification.Builder(this, TAG);
         builder.setContentText(TAG);
         builder.setSmallIcon(android.R.mipmap.sym_def_app_icon);
@@ -109,10 +115,6 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void testCancelNotify() {
-        if (mNotificationManager == null) {
-            mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        }
-
         mNotificationManager.cancel(ID);
     }
 
@@ -151,12 +153,7 @@ public class MainActivity extends FragmentActivity {
                 .setNegativeButtonText("Cancel")
                 .build();
 
-        findViewById(R.id.main_content).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                biometricPrompt.authenticate(promptInfo);
-            }
-        });
+        biometricPrompt.authenticate(promptInfo);
     }
 
     private void testProp() {
@@ -172,46 +169,34 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
-    private void testCrash() {
-        Button je = new Button(getBaseContext());
-        je.setText("je");
-        je.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                throw new AndroidRuntimeException("JE");
+    private void setupTestButtons() {
+        addButton("Bind Service", v -> testBindService());
+        addButton("Unbind Service", v -> testUnbindService());
+        addButton("Installed Apps", v -> testGetInstalledApplications());
+        addButton("Send Notify", v -> testSendNotify());
+        addButton("Cancel Notify", v -> testCancelNotify());
+        addButton("Biometric", v -> testBiometric());
+        addButton("Prop", v -> testProp());
+        addButton("JE", v -> {
+            throw new AndroidRuntimeException("JE");
+        });
+        addButton("NE", v -> getNativeHello());
+        addButton("ANR", v -> {
+            try {
+                Thread.sleep(15000);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "anr", e);
             }
         });
-        ((ViewGroup) findViewById(R.id.main_content)).addView(je);
-
-        Button ne = new Button(getBaseContext());
-        ne.setText("ne");
-        ne.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getNativeHello();
-            }
-        });
-        ((ViewGroup) findViewById(R.id.main_content)).addView(ne);
-
-        Button anr = new Button(getBaseContext());
-        anr.setText("anr");
-        anr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    Thread.sleep(15000);
-                } catch (InterruptedException e) {
-                    Log.e(TAG, "anr", e);
-                }
-            }
-        });
-        ((ViewGroup) findViewById(R.id.main_content)).addView(anr);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContent = findViewById(R.id.main_content);
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        setupTestButtons();
         Log.d(TAG, "onCreate");
     }
 
